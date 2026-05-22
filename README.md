@@ -40,6 +40,12 @@ node bin/ai-sdlc.js init
 node bin/ai-sdlc.js init --target cursor
 ```
 
+Після встановлення відкрий репозиторій у Cursor і запусти команду
+`bootstrap-ai-sdlc` з `.cursor/commands/bootstrap-ai-sdlc.md`. Вона просить
+агента проаналізувати репозиторій, створити 1-3 seed specs для найкритичніших
+модулів, оновити `specs/_index.md` і `specs/_coverage.md`, не змінюючи бізнес
+код.
+
 `AGENTS.md` обробляється окремо. Якщо файлу немає, `init` створює його з
 керованим блоком `ai-sdlc`. Якщо файл вже існує, команда зберігає наявний
 контент і додає або оновлює тільки цей блок:
@@ -76,7 +82,7 @@ node bin/ai-sdlc.js doctor
 scaffold. Якщо щось відсутнє, команда завершується з кодом `1` і пропонує
 запустити `ai-sdlc init`.
 
-Щоб безпечно видалити встановлені Cursor agents, skills і rules:
+Щоб безпечно видалити встановлені Cursor commands, agents, skills і rules:
 
 ```bash
 node bin/ai-sdlc.js uninstall

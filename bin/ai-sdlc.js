@@ -35,6 +35,7 @@ Options:
 }
 
 const managedTemplateFiles = [
+  ".cursor/commands/bootstrap-ai-sdlc.md",
   ".cursor/agents/diff-analyzer.md",
   ".cursor/agents/spec-matcher.md",
   ".cursor/agents/self-healer.md",
@@ -203,6 +204,10 @@ function doctor() {
       label: ".cursor/agents exists",
       path: ".cursor/agents",
       type: "directory",
+    },
+    {
+      label: "command: bootstrap-ai-sdlc.md",
+      path: ".cursor/commands/bootstrap-ai-sdlc.md",
     },
     {
       label: "agent: diff-analyzer.md",

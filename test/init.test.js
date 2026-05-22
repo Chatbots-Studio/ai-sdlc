@@ -11,6 +11,7 @@ const { join, resolve } = require("node:path");
 const { spawnSync } = require("node:child_process");
 const {
   hasAiSdlcAgentsInstructions,
+  removeManagedBlock,
   upsertManagedBlock,
 } = require("../bin/ai-sdlc.js");
 
@@ -43,6 +44,10 @@ assert.equal(
 assert.equal(hasAiSdlcAgentsInstructions(`${startMarker}\nBlock\n${endMarker}`), true);
 assert.equal(hasAiSdlcAgentsInstructions(readFileSync(templateAgents, "utf8")), true);
 assert.equal(hasAiSdlcAgentsInstructions("Project-only guidance"), false);
+assert.equal(
+  removeManagedBlock(`Keep\n\n${startMarker}\nBlock\n${endMarker}\n`),
+  "Keep\n",
+);
 
 const dir = mkdtempSync(join(tmpdir(), "ai-sdlc-test-"));
 
@@ -90,6 +95,24 @@ try {
   result = run(["init", "--target", "claude-code"], dir);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /Unsupported target/);
+
+  result = run(["uninstall"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.equal(agentsContent, "Existing project guidance\n");
+  assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), false);
+  assert.equal(existsSync(join(dir, "specs", "_index.md")), true);
+  assert.match(result.stdout, /Removed files: 11/);
+
+  result = run(["init"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  writeFileSync(join(dir, "specs", "_index.md"), "# Real knowledge\n");
+  result = run(["uninstall", "--include-specs"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(existsSync(join(dir, "specs", "_index.md")), true);
+  assert.equal(existsSync(join(dir, "specs", "_coverage.md")), false);
+  assert.match(result.stdout, /Skipped specs\/_index.md \(not a template placeholder\)/);
+  assert.match(result.stdout, /Removed specs\/_coverage.md/);
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

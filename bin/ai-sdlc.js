@@ -6,6 +6,7 @@ const {
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
   statSync,
   writeFileSync,
 } = require("node:fs");
@@ -22,14 +23,35 @@ function printHelp() {
 Usage:
   ai-sdlc init [options]     Initialize AI SDLC assets for a project
   ai-sdlc doctor             Check whether AI SDLC is installed
+  ai-sdlc uninstall [options] Remove installed AI SDLC template files
   ai-sdlc version            Print the ai-sdlc CLI version
   ai-sdlc --help             Show this help message
 
 Options:
   --target cursor            Install templates for Cursor (default)
   --force                    Overwrite existing files
+  --include-specs            Also remove placeholder specs index files
 `);
 }
+
+const managedTemplateFiles = [
+  ".cursor/agents/diff-analyzer.md",
+  ".cursor/agents/spec-matcher.md",
+  ".cursor/agents/self-healer.md",
+  ".cursor/agents/knowledge-grower.md",
+  ".cursor/skills/spec-generator/SKILL.md",
+  ".cursor/skills/e2e-generator/SKILL.md",
+  ".cursor/skills/criticality-classifier/SKILL.md",
+  ".cursor/skills/kb-indexer/SKILL.md",
+  ".cursor/rules/ai-sdlc-core.mdc",
+  ".cursor/rules/specs-conventions.mdc",
+  ".cursor/rules/test-conventions.mdc",
+];
+
+const placeholderSpecFiles = [
+  "specs/_index.md",
+  "specs/_coverage.md",
+];
 
 function parseInitArgs(args) {
   const options = {
@@ -122,6 +144,19 @@ function upsertManagedBlock(existingContent, blockContent) {
 
   const separator = existingContent.endsWith("\n") ? "\n" : "\n\n";
   return `${existingContent}${separator}${managedBlock}\n`;
+}
+
+function removeManagedBlock(existingContent) {
+  const blockPattern = new RegExp(
+    `\\n*${escapeRegExp(managedBlockStart)}[\\s\\S]*?${escapeRegExp(managedBlockEnd)}\\n*`,
+    "m",
+  );
+
+  return existingContent.replace(blockPattern, (match) => {
+    const startsWithNewline = match.startsWith("\n");
+    const endsWithNewline = match.endsWith("\n");
+    return startsWithNewline && endsWithNewline ? "\n" : "";
+  });
 }
 
 function escapeRegExp(value) {
@@ -242,6 +277,142 @@ function doctor() {
   process.exitCode = 1;
 }
 
+function parseUninstallArgs(args) {
+  const options = {
+    includeSpecs: false,
+  };
+
+  for (const arg of args) {
+    if (arg === "--include-specs") {
+      options.includeSpecs = true;
+      continue;
+    }
+
+    throw new Error(`Unknown uninstall option: ${arg}`);
+  }
+
+  return options;
+}
+
+function uninstall(args) {
+  let options;
+
+  try {
+    options = parseUninstallArgs(args);
+  } catch (error) {
+    console.error(error.message);
+    console.error("Run ai-sdlc uninstall or ai-sdlc uninstall --include-specs.");
+    process.exitCode = 1;
+    return;
+  }
+
+  const root = process.cwd();
+  let removed = 0;
+  let updated = 0;
+  let skipped = 0;
+
+  const agentsResult = uninstallAgentsFile(join(root, "AGENTS.md"));
+  if (agentsResult === "updated") {
+    updated += 1;
+  } else {
+    skipped += 1;
+  }
+
+  for (const targetPath of managedTemplateFiles) {
+    if (removeFileIfExists(join(root, targetPath))) {
+      console.log(`Removed ${targetPath}`);
+      removed += 1;
+    } else {
+      console.log(`Skipped missing ${targetPath}`);
+      skipped += 1;
+    }
+  }
+
+  if (options.includeSpecs) {
+    for (const targetPath of placeholderSpecFiles) {
+      const result = removePlaceholderSpec(root, targetPath);
+      if (result === "removed") {
+        removed += 1;
+      } else {
+        skipped += 1;
+      }
+    }
+  } else {
+    for (const targetPath of placeholderSpecFiles) {
+      console.log(`Skipped ${targetPath} (specs are preserved by default)`);
+      skipped += 1;
+    }
+  }
+
+  console.log("");
+  console.log("ai-sdlc uninstall complete.");
+  console.log(`Removed files: ${removed}`);
+  console.log(`Updated files: ${updated}`);
+  console.log(`Skipped files: ${skipped}`);
+}
+
+function uninstallAgentsFile(agentsPath) {
+  if (!existsSync(agentsPath)) {
+    console.log("Skipped missing AGENTS.md");
+    return "skipped";
+  }
+
+  const existingContent = readFileSync(agentsPath, "utf8");
+  const nextContent = removeManagedBlock(existingContent);
+
+  if (nextContent === existingContent) {
+    console.log("Skipped AGENTS.md (no ai-sdlc managed block)");
+    return "skipped";
+  }
+
+  if (nextContent.trim().length === 0) {
+    rmSync(agentsPath);
+    console.log("Removed AGENTS.md");
+    return "updated";
+  }
+
+  writeFileSync(agentsPath, nextContent);
+  console.log("Updated AGENTS.md (removed ai-sdlc managed block)");
+  return "updated";
+}
+
+function removeFileIfExists(targetPath) {
+  if (!existsSync(targetPath) || !statSync(targetPath).isFile()) {
+    return false;
+  }
+
+  rmSync(targetPath);
+  return true;
+}
+
+function removePlaceholderSpec(root, targetPath) {
+  const targetFile = join(root, targetPath);
+
+  if (!existsSync(targetFile) || !statSync(targetFile).isFile()) {
+    console.log(`Skipped missing ${targetPath}`);
+    return "skipped";
+  }
+
+  if (!isPlaceholderSpecFile(targetFile, targetPath)) {
+    console.log(`Skipped ${targetPath} (not a template placeholder)`);
+    return "skipped";
+  }
+
+  rmSync(targetFile);
+  console.log(`Removed ${targetPath}`);
+  return "removed";
+}
+
+function isPlaceholderSpecFile(targetFile, targetPath) {
+  const templateFile = join(__dirname, "..", "templates", "cursor", targetPath);
+
+  if (!existsSync(templateFile)) {
+    return false;
+  }
+
+  return readFileSync(targetFile, "utf8") === readFileSync(templateFile, "utf8");
+}
+
 function checkPath(root, targetPath, type = "file") {
   const fullPath = join(root, targetPath);
 
@@ -333,6 +504,11 @@ function main(argv) {
     return;
   }
 
+  if (command === "uninstall") {
+    uninstall(argv.slice(1));
+    return;
+  }
+
   console.error(`Unknown command: ${command}`);
   console.error("Run ai-sdlc --help for usage.");
   process.exitCode = 1;
@@ -344,5 +520,6 @@ if (require.main === module) {
 
 module.exports = {
   hasAiSdlcAgentsInstructions,
+  removeManagedBlock,
   upsertManagedBlock,
 };

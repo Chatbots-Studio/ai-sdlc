@@ -75,3 +75,20 @@ node bin/ai-sdlc.js doctor
 `doctor` перевіряє `AGENTS.md`, Cursor agents, skills, rules і `specs/`
 scaffold. Якщо щось відсутнє, команда завершується з кодом `1` і пропонує
 запустити `ai-sdlc init`.
+
+Щоб безпечно видалити встановлені Cursor agents, skills і rules:
+
+```bash
+node bin/ai-sdlc.js uninstall
+```
+
+`uninstall` видаляє тільки керований блок `ai-sdlc` з `AGENTS.md` і не чіпає
+інший контент цього файлу. `specs/` за замовчуванням не видаляється, бо там
+може бути згенерована knowledge base.
+
+Щоб додатково прибрати початкові placeholder-файли `specs/_index.md` і
+`specs/_coverage.md`, якщо вони ще не були змінені:
+
+```bash
+node bin/ai-sdlc.js uninstall --include-specs
+```

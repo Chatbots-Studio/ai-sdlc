@@ -7,7 +7,8 @@
   },
   "scripts": {
     "start": "node bin/ai-sdlc.js",
-    "test": "node bin/ai-sdlc.js --help && node bin/ai-sdlc.js version && node bin/ai-sdlc.js init"
+    "test": "node bin/ai-sdlc.js --help && node bin/ai-sdlc.js version && npm run test:init",
+    "test:init": "node -e \"const { mkdtempSync, existsSync, writeFileSync, rmSync } = require('node:fs'); const { tmpdir } = require('node:os'); const { join, resolve } = require('node:path'); const { spawnSync } = require('node:child_process'); const cli = resolve('bin/ai-sdlc.js'); const dir = mkdtempSync(join(tmpdir(), 'ai-sdlc-test-')); const run = (args) => spawnSync(process.execPath, [cli, ...args], { cwd: dir, encoding: 'utf8' }); let r = run(['init']); if (r.status !== 0) throw new Error(r.stderr || r.stdout); if (!existsSync(join(dir, 'AGENTS.md'))) throw new Error('AGENTS.md was not copied'); writeFileSync(join(dir, 'AGENTS.md'), 'custom'); r = run(['init']); if (r.status !== 0 || !r.stderr.includes('skipped existing file AGENTS.md')) throw new Error('second init did not skip existing AGENTS.md'); r = run(['init', '--force']); if (r.status !== 0) throw new Error(r.stderr || r.stdout); r = run(['init', '--target', 'claude-code']); if (r.status === 0 || !r.stderr.includes('Unsupported target')) throw new Error('unsupported target did not fail cleanly'); rmSync(dir, { recursive: true, force: true });\""
   },
   "keywords": [
     "ai-sdlc",

@@ -21,7 +21,8 @@
 
 ## CLI
 
-Початковий npm package надає команду `ai-sdlc`:
+Початковий npm package надає команду `ai-sdlc`, яка встановлює Cursor-ready
+AI SDLC templates у поточний репозиторій:
 
 ```bash
 npm install
@@ -30,4 +31,23 @@ node bin/ai-sdlc.js version
 node bin/ai-sdlc.js init
 ```
 
-На цьому етапі `init` лише виводить placeholder. Копіювання Cursor agents, skills, rules і specs templates буде додано наступним кроком.
+За замовчуванням `init` копіює `templates/cursor` у поточну директорію і не
+перезаписує існуючі файли:
+
+```bash
+node bin/ai-sdlc.js init
+node bin/ai-sdlc.js init --target cursor
+```
+
+Щоб перезаписати існуючі файли:
+
+```bash
+node bin/ai-sdlc.js init --force
+```
+
+Поки підтримується тільки Cursor target. Інші targets завершаться чистою
+помилкою:
+
+```bash
+node bin/ai-sdlc.js init --target claude-code
+```

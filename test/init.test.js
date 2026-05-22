@@ -17,6 +17,15 @@ const {
 
 const cli = resolve(__dirname, "..", "bin", "ai-sdlc.js");
 const templateAgents = resolve(__dirname, "..", "templates", "cursor", "AGENTS.md");
+const templateDiffAnalyzer = resolve(
+  __dirname,
+  "..",
+  "templates",
+  "cursor",
+  ".cursor",
+  "agents",
+  "diff-analyzer.md",
+);
 const startMarker = "<!-- ai-sdlc:start -->";
 const endMarker = "<!-- ai-sdlc:end -->";
 
@@ -30,6 +39,11 @@ function run(args, cwd) {
 function countMarkers(content) {
   return (content.match(/<!-- ai-sdlc:start -->/g) || []).length;
 }
+
+assert.equal(
+  upsertManagedBlock("", "AI block"),
+  `${startMarker}\nAI block\n${endMarker}\n`,
+);
 
 assert.equal(
   upsertManagedBlock("User notes\n", "AI block"),
@@ -75,10 +89,14 @@ try {
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.match(result.stdout, /AI SDLC installation looks complete/);
 
+  const installedDiffAnalyzer = join(dir, ".cursor", "agents", "diff-analyzer.md");
+  writeFileSync(installedDiffAnalyzer, "custom agent content\n");
+
   result = run(["init"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
   assert.equal(countMarkers(agentsContent), 1);
+  assert.equal(readFileSync(installedDiffAnalyzer, "utf8"), "custom agent content\n");
   assert.match(result.stdout, /Updated files: 1/);
   assert.match(result.stdout, /Skipped files: 16/);
 
@@ -94,6 +112,10 @@ try {
   agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
   assert.match(agentsContent, /^Existing project guidance/);
   assert.equal(countMarkers(agentsContent), 1);
+  assert.equal(
+    readFileSync(installedDiffAnalyzer, "utf8"),
+    readFileSync(templateDiffAnalyzer, "utf8"),
+  );
 
   result = run(["init", "--target", "claude-code"], dir);
   assert.notEqual(result.status, 0);

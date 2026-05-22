@@ -33,6 +33,7 @@ reusable skills, rules, a bootstrap command, and a `specs/` scaffold.
 - Cursor rules for core behavior, specs conventions, and test conventions.
 - A Cursor command for bootstrapping the first repository specs.
 - `specs/_index.md` and `specs/_coverage.md` starter files.
+- Optional manual Cursor/GitHub automation documentation templates.
 
 ## Quick Start
 
@@ -77,6 +78,10 @@ and avoid business-code changes.
 
 If the test framework is unclear, the bootstrap prompt asks for review before
 adding e2e tests.
+
+Optional manual Cursor Cloud and GitHub-connected automation setup is described
+in [docs/cursor-automations.md](docs/cursor-automations.md). v0.1 does not
+create automations through the CLI.
 
 ## Commands
 
@@ -144,6 +149,9 @@ AGENTS.md
     ai-sdlc-core.mdc
     specs-conventions.mdc
     test-conventions.mdc
+docs/
+  pr-review-automation.md
+  knowledge-growth-automation.md
 specs/
   _index.md
   _coverage.md

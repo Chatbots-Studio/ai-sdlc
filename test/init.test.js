@@ -61,11 +61,13 @@ try {
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.equal(existsSync(join(dir, "AGENTS.md")), true);
   assert.equal(existsSync(join(dir, ".cursor", "commands", "bootstrap-ai-sdlc.md")), true);
+  assert.equal(existsSync(join(dir, "docs", "pr-review-automation.md")), true);
+  assert.equal(existsSync(join(dir, "docs", "knowledge-growth-automation.md")), true);
   assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), true);
 
   let agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
   assert.equal(countMarkers(agentsContent), 1);
-  assert.match(result.stdout, /Created files: 15/);
+  assert.match(result.stdout, /Created files: 17/);
   assert.match(result.stdout, /Updated files: 0/);
   assert.match(result.stdout, /Skipped files: 0/);
 
@@ -78,7 +80,7 @@ try {
   agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
   assert.equal(countMarkers(agentsContent), 1);
   assert.match(result.stdout, /Updated files: 1/);
-  assert.match(result.stdout, /Skipped files: 14/);
+  assert.match(result.stdout, /Skipped files: 16/);
 
   writeFileSync(join(dir, "AGENTS.md"), "Existing project guidance\n");
   result = run(["init"], dir);

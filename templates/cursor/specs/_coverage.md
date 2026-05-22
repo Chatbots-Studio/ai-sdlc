@@ -2,8 +2,8 @@
 
 This file tracks how much of the repository has AI SDLC knowledge coverage.
 
-Use `unknown` until coverage has been verified. Do not report guessed coverage
-as fact.
+Use `unknown` until coverage has evidence. Do not report guessed coverage as
+fact.
 
 ## Repository scan scope
 
@@ -24,15 +24,16 @@ report numeric zero for missing critical modules.
 
 | Module | Source Coverage | Critical Paths | Test Coverage | Evidence | Gaps | Last Checked |
 | --- | --- | --- | --- | --- | --- | --- |
-| example-module | unknown | unknown | unknown | static: path/to/source.ext:line; test: path/to/test.ext:line; runtime: none | Replace example during bootstrap. | YYYY-MM-DD |
+| example-module | unknown | unknown | unknown | static: path/to/source.ext:line; test: path/to/test.ext:line; test execution: none; runtime: none | Replace example during bootstrap. | YYYY-MM-DD |
 
 The example row is illustrative only. Replace it with real repository modules
 or remove it during bootstrap.
 
-Coverage values: `verified`, `partial`, `none`, `unknown`.
+Coverage values: `checked`, `partial`, `none`, `unknown`.
 
 Status values: `draft`, `draft: path-accounting-warning`, `reviewed`,
-`static/test verified`, `runtime verified`.
+`static + linked-test evidence`, `runtime verified`.
 
-Do not use `verified` without qualification when `runtime_verified` is false.
-Use `static/test verified` or describe the module as static/test verified only.
+Never use `verified` unless a test command, runtime check, or reviewer action
+was actually executed and recorded. Linked or inspected test files are
+`test evidence` or `linked-test evidence`, not verified behavior.

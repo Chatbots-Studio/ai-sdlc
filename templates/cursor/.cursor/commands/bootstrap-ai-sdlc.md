@@ -38,10 +38,14 @@ not contain one of them, skip it.
 - Do not write `Critical modules without specs = 0` unless repository scan
   scope is documented.
 - If the repository is not under git, state that business-code modification
-  cannot be diff-verified.
+  cannot be diff-checked.
 - If app, database, or required services were not started, set
   `runtime_verified: false` in generated specs and report runtime verification
   as static/test only.
+- Never use `verified` unless a test command, runtime check, or reviewer action
+  was actually executed and recorded.
+- Linked or inspected test files are `test evidence` or `linked-test evidence`,
+  not verified behavior.
 - If confidence is below 80%, document open questions instead of creating a
   speculative spec.
 
@@ -67,6 +71,9 @@ not contain one of them, skip it.
    - business context
    - source paths
    - linked tests
+   - tests discovered
+   - tests executed
+   - test execution evidence
    - skipped paths for imported or discovered files that are out of scope
    - evidence references
    - separate static evidence, test evidence, and runtime evidence

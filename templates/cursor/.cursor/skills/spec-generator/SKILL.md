@@ -44,12 +44,16 @@ remain stable over time.
   for in exactly one of `source_paths`, `linked_tests`, or `skipped_paths`.
 - If a file is imported by a selected module but not included in
   `source_paths`, add it to `skipped_paths` with a reason and evidence.
-- Separate static facts, test-derived facts, and runtime-verified facts.
+- Separate static facts, test-derived facts, and runtime-checked facts.
 - When `runtime_verified` is `false`, do not claim runtime behavior. Use
   wording like `statically indicated by`, `covered by existing test`, or `not
-  runtime-verified`.
+  runtime-checked`.
 - Use `runtime_evidence: ["none"]` when no app, database, service, or command
   was run to verify behavior.
+- Never use `verified` unless a test command, runtime check, or reviewer action
+  was actually executed and recorded.
+- Linked or inspected test files are `test evidence` or `linked-test evidence`,
+  not verified behavior.
 
 ## Spec Template
 
@@ -57,12 +61,17 @@ remain stable over time.
 ---
 module: example-module
 criticality: medium
-last_verified: YYYY-MM-DD
+last_checked: YYYY-MM-DD
 owners: []
 source_paths:
   - path/to/source.ext
 linked_tests:
   - path/to/test.ext
+tests_discovered:
+  - path/to/test.ext
+tests_executed: []
+test_execution_evidence:
+  - "none"
 skipped_paths:
   - path: path/to/file
     reason: "why it is out of scope"
@@ -93,14 +102,14 @@ matches the evidence actually collected.
 | Path | Accounted As | Reason | Evidence |
 | --- | --- | --- | --- |
 | path/to/source.ext | source_paths | In module scope. | path/to/source.ext:line |
-| path/to/test.ext | linked_tests | Existing test coverage. | path/to/test.ext:line |
+| path/to/test.ext | linked_tests | Linked-test evidence; not executed unless listed in tests_executed. | path/to/test.ext:line |
 | path/to/imported-file.ext | skipped_paths | Out of scope because ... | path/to/source.ext:line |
 
 ## Invariants
 
 - Concrete invariant. Static evidence: `path/to/source.ext:line`.
 - Test-covered invariant. Test evidence: `path/to/test.ext:line`.
-- Runtime-verified invariant, only when verified. Runtime evidence:
+- Runtime-checked invariant, only when a runtime check was executed. Runtime evidence:
   `command/result`.
 
 ## Critical Paths

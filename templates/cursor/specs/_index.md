@@ -7,7 +7,7 @@ source paths, specs, and tests as the repository knowledge base grows.
 
 ## Modules
 
-| Module | Source Paths | Criticality | Spec | Owners | Tests | Last Verified | Status |
+| Module | Source Paths | Criticality | Spec | Owners | Tests | Last Checked | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | example-module | path/to/source.ext | medium | specs/example-module/spec.md | TBD | TBD | YYYY-MM-DD | example |
 
@@ -20,9 +20,12 @@ or remove it during bootstrap.
 - `draft: path-accounting-warning`: generated with unresolved Source Paths or
   imported files that must be reconciled in the target spec.
 - `reviewed`: accepted by a module owner.
-- `static/test verified`: accepted for static and test evidence only; runtime
-  behavior was not verified.
+- `static + linked-test evidence`: accepted for static facts and linked or
+  inspected tests; test execution is not implied.
 - `runtime verified`: accepted with runtime evidence from an app, database,
   service, or command run.
 - `stale`: code changed and spec needs verification.
 - `example`: illustrative placeholder.
+
+Never use `verified` unless a test command, runtime check, or reviewer action
+was actually executed and recorded.

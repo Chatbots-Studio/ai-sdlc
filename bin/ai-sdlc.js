@@ -38,6 +38,7 @@ const managedTemplateFiles = [
   ".cursor/commands/bootstrap-ai-sdlc.md",
   ".cursor/agents/diff-analyzer.md",
   ".cursor/agents/spec-matcher.md",
+  ".cursor/agents/test-runner.md",
   ".cursor/agents/self-healer.md",
   ".cursor/agents/knowledge-grower.md",
   ".cursor/skills/spec-generator/SKILL.md",
@@ -224,6 +225,10 @@ function doctor() {
     {
       label: "agent: spec-matcher.md",
       path: ".cursor/agents/spec-matcher.md",
+    },
+    {
+      label: "agent: test-runner.md",
+      path: ".cursor/agents/test-runner.md",
     },
     {
       label: "agent: self-healer.md",

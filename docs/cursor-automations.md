@@ -16,8 +16,8 @@ Expected behavior:
 
 1. Run `@diff-analyzer` to classify changed files and identify affected specs.
 2. Run `@spec-matcher` to compare changes against known invariants.
-3. Run relevant tests if the repository has a clear test command and the
-   automation environment can execute it.
+3. Run `@test-runner` to select and execute relevant tests if the repository
+   has a clear test command and the automation environment can execute it.
 4. Escalate when confidence is below 80%, tests cannot run, or an invariant may
    be violated.
 
@@ -28,9 +28,10 @@ For this PR, run @diff-analyzer first.
 
 Then run @spec-matcher for every affected spec listed by @diff-analyzer.
 
-If the repository has a clear test command and this automation environment can
-run it, run the narrowest relevant tests for the affected modules. If test setup
-is unclear, do not guess; report that tests were not run.
+Then run @test-runner. If the repository has a clear test command and this
+automation environment can run it, run the narrowest relevant tests for the
+affected modules. If test setup is unclear, do not guess; report that tests
+were not run.
 
 Post a concise PR review summary with:
 - changed modules

@@ -26,8 +26,8 @@ reusable skills, rules, a bootstrap command, and a `specs/` scaffold.
 ## What It Installs
 
 - `AGENTS.md` instructions for AI SDLC behavior.
-- Cursor agents for diff analysis, spec matching, self-healing, and knowledge
-  growth.
+- Cursor agents for diff analysis, spec matching, test selection/execution,
+  self-healing, and knowledge growth.
 - Cursor skills for spec generation, e2e test generation, criticality
   classification, and knowledge base indexing.
 - Cursor rules for core behavior, specs conventions, and test conventions.
@@ -140,6 +140,7 @@ AGENTS.md
   agents/
     diff-analyzer.md
     spec-matcher.md
+    test-runner.md
     self-healer.md
     knowledge-grower.md
   skills/
@@ -181,8 +182,9 @@ coverage gaps.
 ### Spec-Aware PR Review
 
 `@diff-analyzer` identifies affected modules. `@spec-matcher` checks changes
-against known specs and invariants. In v0.1 this is installed as local Cursor
-agent guidance, not as an automatic PR trigger.
+against known specs and invariants. `@test-runner` selects and runs relevant
+tests only when commands and runtime setup are clear. In v0.1 this is installed
+as local Cursor agent guidance, not as an automatic PR trigger.
 
 ### Self-Healing Tests
 

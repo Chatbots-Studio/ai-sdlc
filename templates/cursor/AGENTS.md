@@ -26,7 +26,8 @@ are reviewed by a module owner.
 3. Run `@spec-matcher` for all affected specs listed in `specs/_index.md`.
 4. If source paths are missing, inspect repository structure before concluding
    that no spec applies.
-5. Run relevant tests from the matched specs and local test conventions.
+5. Run `@test-runner` to select and execute relevant tests when the command and
+   runtime setup are clear.
 6. If tests fail, use `@self-healer` only for conservative fixes.
 7. Escalate when confidence is low or business logic is risky.
 

@@ -136,7 +136,10 @@ function upsertManagedBlock(existingContent, blockContent) {
   );
 
   if (blockPattern.test(existingContent)) {
-    return existingContent.replace(blockPattern, managedBlock);
+    const existingBlock = existingContent.match(blockPattern)[0];
+    return existingBlock === managedBlock
+      ? existingContent
+      : existingContent.replace(blockPattern, managedBlock);
   }
 
   if (existingContent.length === 0) {
@@ -175,6 +178,11 @@ function installAgentsFile(sourceFile, targetFile) {
 
   const existingContent = readFileSync(targetFile, "utf8");
   const nextContent = upsertManagedBlock(existingContent, blockContent);
+
+  if (nextContent === existingContent) {
+    return "skipped";
+  }
+
   writeFileSync(targetFile, nextContent);
   return "updated";
 }

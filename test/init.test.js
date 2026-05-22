@@ -4,6 +4,7 @@ const {
   mkdtempSync,
   readFileSync,
   rmSync,
+  statSync,
   writeFileSync,
 } = require("node:fs");
 const { tmpdir } = require("node:os");
@@ -55,6 +56,9 @@ assert.equal(
   `User\n\n${startMarker}\nNew\n${endMarker}\n`,
 );
 
+const identicalManagedContent = `${startMarker}\nAI block\n${endMarker}\n`;
+assert.equal(upsertManagedBlock(identicalManagedContent, "AI block"), identicalManagedContent);
+
 assert.equal(hasAiSdlcAgentsInstructions(`${startMarker}\nBlock\n${endMarker}`), true);
 assert.equal(hasAiSdlcAgentsInstructions(readFileSync(templateAgents, "utf8")), true);
 assert.equal(hasAiSdlcAgentsInstructions("Project-only guidance"), false);
@@ -80,6 +84,8 @@ try {
   assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), true);
 
   let agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  const firstAgentsContent = agentsContent;
+  const agentsMtime = statSync(join(dir, "AGENTS.md")).mtimeMs;
   assert.equal(countMarkers(agentsContent), 1);
   assert.match(result.stdout, /Created files: 17/);
   assert.match(result.stdout, /Updated files: 0/);
@@ -95,17 +101,24 @@ try {
   result = run(["init"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.equal(agentsContent, firstAgentsContent);
+  assert.equal(statSync(join(dir, "AGENTS.md")).mtimeMs, agentsMtime);
   assert.equal(countMarkers(agentsContent), 1);
   assert.equal(readFileSync(installedDiffAnalyzer, "utf8"), "custom agent content\n");
-  assert.match(result.stdout, /Updated files: 1/);
-  assert.match(result.stdout, /Skipped files: 16/);
+  assert.match(result.stdout, /Updated files: 0/);
+  assert.match(result.stdout, /Skipped files: 17/);
 
-  writeFileSync(join(dir, "AGENTS.md"), "Existing project guidance\n");
+  writeFileSync(
+    join(dir, "AGENTS.md"),
+    `Existing project guidance\n\n${startMarker}\nOld managed block\n${endMarker}\n`,
+  );
   result = run(["init"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
   assert.match(agentsContent, /^Existing project guidance/);
+  assert.doesNotMatch(agentsContent, /Old managed block/);
   assert.equal(countMarkers(agentsContent), 1);
+  assert.match(result.stdout, /Updated files: 1/);
 
   result = run(["init", "--force"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);

@@ -155,3 +155,23 @@ try {
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }
+
+const repeatDir = mkdtempSync(join(tmpdir(), "ai-sdlc-repeat-test-"));
+
+try {
+  let result = run(["init"], repeatDir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+
+  const agentsPath = join(repeatDir, "AGENTS.md");
+  const before = readFileSync(agentsPath, "utf8");
+
+  result = run(["init"], repeatDir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+
+  const after = readFileSync(agentsPath, "utf8");
+  assert.equal(after, before);
+  assert.match(result.stdout, /Created files: 0/);
+  assert.match(result.stdout, /Updated files: 0/);
+} finally {
+  rmSync(repeatDir, { recursive: true, force: true });
+}

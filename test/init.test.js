@@ -1,0 +1,78 @@
+const assert = require("node:assert/strict");
+const {
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} = require("node:fs");
+const { tmpdir } = require("node:os");
+const { join, resolve } = require("node:path");
+const { spawnSync } = require("node:child_process");
+const { upsertManagedBlock } = require("../bin/ai-sdlc.js");
+
+const cli = resolve(__dirname, "..", "bin", "ai-sdlc.js");
+const startMarker = "<!-- ai-sdlc:start -->";
+const endMarker = "<!-- ai-sdlc:end -->";
+
+function run(args, cwd) {
+  return spawnSync(process.execPath, [cli, ...args], {
+    cwd,
+    encoding: "utf8",
+  });
+}
+
+function countMarkers(content) {
+  return (content.match(/<!-- ai-sdlc:start -->/g) || []).length;
+}
+
+assert.equal(
+  upsertManagedBlock("User notes\n", "AI block"),
+  `User notes\n\n${startMarker}\nAI block\n${endMarker}\n`,
+);
+
+assert.equal(
+  upsertManagedBlock(`User\n\n${startMarker}\nOld\n${endMarker}\n`, "New"),
+  `User\n\n${startMarker}\nNew\n${endMarker}\n`,
+);
+
+const dir = mkdtempSync(join(tmpdir(), "ai-sdlc-test-"));
+
+try {
+  let result = run(["init"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.equal(existsSync(join(dir, "AGENTS.md")), true);
+  assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), true);
+
+  let agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.equal(countMarkers(agentsContent), 1);
+  assert.match(result.stdout, /Created files: 14/);
+  assert.match(result.stdout, /Updated files: 0/);
+  assert.match(result.stdout, /Skipped files: 0/);
+
+  result = run(["init"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.equal(countMarkers(agentsContent), 1);
+  assert.match(result.stdout, /Updated files: 1/);
+  assert.match(result.stdout, /Skipped files: 13/);
+
+  writeFileSync(join(dir, "AGENTS.md"), "Existing project guidance\n");
+  result = run(["init"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.match(agentsContent, /^Existing project guidance/);
+  assert.equal(countMarkers(agentsContent), 1);
+
+  result = run(["init", "--force"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
+  assert.match(agentsContent, /^Existing project guidance/);
+  assert.equal(countMarkers(agentsContent), 1);
+
+  result = run(["init", "--target", "claude-code"], dir);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /Unsupported target/);
+} finally {
+  rmSync(dir, { recursive: true, force: true });
+}

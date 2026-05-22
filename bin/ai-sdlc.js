@@ -7,11 +7,14 @@ const {
   readdirSync,
   readFileSync,
   statSync,
+  writeFileSync,
 } = require("node:fs");
 const { dirname, join, relative } = require("node:path");
 
 const packageJsonPath = join(__dirname, "..", "package.json");
 const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+const managedBlockStart = "<!-- ai-sdlc:start -->";
+const managedBlockEnd = "<!-- ai-sdlc:end -->";
 
 function printHelp() {
   console.log(`ai-sdlc
@@ -87,6 +90,10 @@ function copyTemplateFile(sourceFile, sourceRoot, targetRoot, force) {
   const relativePath = relative(sourceRoot, sourceFile);
   const targetFile = join(targetRoot, relativePath);
 
+  if (relativePath === "AGENTS.md") {
+    return installAgentsFile(sourceFile, targetFile);
+  }
+
   if (existsSync(targetFile) && !force) {
     console.warn(`Warning: skipped existing file ${relativePath}`);
     return "skipped";
@@ -95,6 +102,44 @@ function copyTemplateFile(sourceFile, sourceRoot, targetRoot, force) {
   mkdirSync(dirname(targetFile), { recursive: true });
   cpSync(sourceFile, targetFile, { force: true });
   return "created";
+}
+
+function upsertManagedBlock(existingContent, blockContent) {
+  const managedBlock = `${managedBlockStart}\n${blockContent.trim()}\n${managedBlockEnd}`;
+  const blockPattern = new RegExp(
+    `${escapeRegExp(managedBlockStart)}[\\s\\S]*?${escapeRegExp(managedBlockEnd)}`,
+    "m",
+  );
+
+  if (blockPattern.test(existingContent)) {
+    return existingContent.replace(blockPattern, managedBlock);
+  }
+
+  if (existingContent.length === 0) {
+    return `${managedBlock}\n`;
+  }
+
+  const separator = existingContent.endsWith("\n") ? "\n" : "\n\n";
+  return `${existingContent}${separator}${managedBlock}\n`;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function installAgentsFile(sourceFile, targetFile) {
+  const blockContent = readFileSync(sourceFile, "utf8");
+  mkdirSync(dirname(targetFile), { recursive: true });
+
+  if (!existsSync(targetFile)) {
+    writeFileSync(targetFile, upsertManagedBlock("", blockContent));
+    return "created";
+  }
+
+  const existingContent = readFileSync(targetFile, "utf8");
+  const nextContent = upsertManagedBlock(existingContent, blockContent);
+  writeFileSync(targetFile, nextContent);
+  return "updated";
 }
 
 function init(args) {
@@ -128,12 +173,15 @@ function init(args) {
   const templateFiles = listFiles(templateRoot);
   let created = 0;
   let skipped = 0;
+  let updated = 0;
 
   for (const sourceFile of templateFiles) {
     const result = copyTemplateFile(sourceFile, templateRoot, targetRoot, options.force);
 
     if (result === "created") {
       created += 1;
+    } else if (result === "updated") {
+      updated += 1;
     } else {
       skipped += 1;
     }
@@ -142,6 +190,7 @@ function init(args) {
   console.log("ai-sdlc init complete.");
   console.log(`Target: ${options.target}`);
   console.log(`Created files: ${created}`);
+  console.log(`Updated files: ${updated}`);
   console.log(`Skipped files: ${skipped}`);
   console.log("");
   console.log("Next steps:");
@@ -173,4 +222,10 @@ function main(argv) {
   process.exitCode = 1;
 }
 
-main(process.argv.slice(2));
+if (require.main === module) {
+  main(process.argv.slice(2));
+}
+
+module.exports = {
+  upsertManagedBlock,
+};

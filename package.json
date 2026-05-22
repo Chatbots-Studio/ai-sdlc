@@ -1,0 +1,22 @@
+{
+  "name": "ai-sdlc",
+  "version": "0.1.0",
+  "description": "Cursor-first installable AI SDLC package.",
+  "bin": {
+    "ai-sdlc": "bin/ai-sdlc.js"
+  },
+  "scripts": {
+    "start": "node bin/ai-sdlc.js",
+    "test": "node bin/ai-sdlc.js --help && node bin/ai-sdlc.js version && node bin/ai-sdlc.js init"
+  },
+  "keywords": [
+    "ai-sdlc",
+    "cursor",
+    "agents",
+    "skills"
+  ],
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  }
+}

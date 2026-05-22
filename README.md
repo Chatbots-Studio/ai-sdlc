@@ -18,3 +18,16 @@
 ## Статус
 
 Репозиторій у розробці: формується сам пакет установки та артефакти, які він розкладає в Cursor/MCP-оточення.
+
+## CLI
+
+Початковий npm package надає команду `ai-sdlc`:
+
+```bash
+npm install
+node bin/ai-sdlc.js --help
+node bin/ai-sdlc.js version
+node bin/ai-sdlc.js init
+```
+
+На цьому етапі `init` лише виводить placeholder. Копіювання Cursor agents, skills, rules і specs templates буде додано наступним кроком.

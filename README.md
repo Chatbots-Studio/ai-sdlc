@@ -72,12 +72,14 @@ The prompt lives at:
 .cursor/commands/bootstrap-ai-sdlc.md
 ```
 
-It asks Cursor to analyze the repository, choose 1-3 critical seed modules,
-create initial specs, update `specs/_index.md`, update `specs/_coverage.md`,
-and avoid business-code changes.
+It asks Cursor to analyze the repository, document scan scope, build a module
+map, choose 1-3 critical seed modules, create initial specs, update
+`specs/_index.md`, update `specs/_coverage.md`, and avoid business-code
+changes.
 
-If the test framework is unclear, the bootstrap prompt asks for review before
-adding e2e tests.
+The bootstrap prompt does not create e2e tests unless the test framework and
+startup flow are clear. When they are unclear, it records TODO coverage notes
+instead of speculative tests.
 
 Optional manual Cursor Cloud and GitHub-connected automation setup is described
 in [docs/cursor-automations.md](docs/cursor-automations.md). v0.1 does not

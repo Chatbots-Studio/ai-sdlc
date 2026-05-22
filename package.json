@@ -1,6 +1,6 @@
 {
   "name": "ai-sdlc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Cursor-first installable AI SDLC package.",
   "bin": {
     "ai-sdlc": "bin/ai-sdlc.js"

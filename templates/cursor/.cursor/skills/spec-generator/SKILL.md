@@ -27,6 +27,29 @@ remain stable over time.
 4. Record dependencies and external contracts.
 5. Record decisions only when supported by source context.
 6. Mark uncertain areas as questions instead of guessing.
+7. Account for every source file under the selected module's Source Paths.
+
+## Invariant Rules
+
+- Each invariant must be concrete and source-backed.
+- Each invariant must label its evidence type: `Static evidence`, `Test
+  evidence`, or `Runtime evidence`.
+- Prefer values, state transitions, permissions, IO contracts, error behavior,
+  persistence effects, or external calls.
+- Avoid generic statements unless paired with evidence and review impact.
+
+## Evidence And Path Accounting Rules
+
+- Every source file under a selected module's Source Paths must be accounted
+  for in exactly one of `source_paths`, `linked_tests`, or `skipped_paths`.
+- If a file is imported by a selected module but not included in
+  `source_paths`, add it to `skipped_paths` with a reason and evidence.
+- Separate static facts, test-derived facts, and runtime-verified facts.
+- When `runtime_verified` is `false`, do not claim runtime behavior. Use
+  wording like `statically indicated by`, `covered by existing test`, or `not
+  runtime-verified`.
+- Use `runtime_evidence: ["none"]` when no app, database, service, or command
+  was run to verify behavior.
 
 ## Spec Template
 
@@ -36,6 +59,23 @@ module: example-module
 criticality: medium
 last_verified: YYYY-MM-DD
 owners: []
+source_paths:
+  - path/to/source.ext
+linked_tests:
+  - path/to/test.ext
+skipped_paths:
+  - path: path/to/file
+    reason: "why it is out of scope"
+    evidence: "path:line"
+evidence:
+  - path/to/source.ext:line
+static_evidence:
+  - path/to/source.ext:line
+test_evidence:
+  - path/to/test.ext:line
+runtime_evidence:
+  - "none"
+runtime_verified: false
 source_pr: ""
 e2e_tests: []
 auto_generated: true
@@ -45,17 +85,32 @@ auto_generated: true
 
 ## Business Context
 
-Describe the behavior this module owns.
+Describe the behavior this module owns. Use static/test/runtime wording that
+matches the evidence actually collected.
+
+## Path Accounting
+
+| Path | Accounted As | Reason | Evidence |
+| --- | --- | --- | --- |
+| path/to/source.ext | source_paths | In module scope. | path/to/source.ext:line |
+| path/to/test.ext | linked_tests | Existing test coverage. | path/to/test.ext:line |
+| path/to/imported-file.ext | skipped_paths | Out of scope because ... | path/to/source.ext:line |
 
 ## Invariants
 
-- Invariant that must always hold.
-- Another invariant that must always hold.
+- Concrete invariant. Static evidence: `path/to/source.ext:line`.
+- Test-covered invariant. Test evidence: `path/to/test.ext:line`.
+- Runtime-verified invariant, only when verified. Runtime evidence:
+  `command/result`.
 
 ## Critical Paths
 
-1. Main success path.
-2. Important failure or recovery path.
+1. **Path name** — trigger -> key code path -> observable result.
+   Static evidence: `path:line`.
+   PR review: changes to `files/functions/config` must re-check this path.
+2. **Failure or recovery path** — trigger -> key code path -> observable result.
+   Test evidence: `path:line`.
+   PR review: changes to `files/functions/config` must re-check this path.
 
 ## Dependencies
 

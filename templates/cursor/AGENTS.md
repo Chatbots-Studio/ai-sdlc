@@ -9,17 +9,26 @@ tests, and recorded decisions must stay aligned.
 invariants, critical paths, linked tests, owners, and decision history.
 
 Always read `specs/_index.md` before analyzing a change. Use it to discover
-known modules, spec locations, criticality, owners, and linked tests.
+known modules, source paths, spec locations, criticality, owners, and linked
+tests.
+
+Before trusting generated specs, verify that each affected module row maps to
+real source paths in the repository. Treat draft specs as advisory until they
+are reviewed by a module owner.
 
 ## Core Workflows
 
 ### PR Review
 
 1. Run `@diff-analyzer` to classify changed files and affected modules.
-2. Run `@spec-matcher` for all affected specs listed in `specs/_index.md`.
-3. Run relevant tests from the matched specs and local test conventions.
-4. If tests fail, use `@self-healer` only for conservative fixes.
-5. Escalate when confidence is low or business logic is risky.
+2. Compare changed files against both the `Spec` and `Source Paths` columns in
+   `specs/_index.md`.
+3. Run `@spec-matcher` for all affected specs listed in `specs/_index.md`.
+4. If source paths are missing, inspect repository structure before concluding
+   that no spec applies.
+5. Run relevant tests from the matched specs and local test conventions.
+6. If tests fail, use `@self-healer` only for conservative fixes.
+7. Escalate when confidence is low or business logic is risky.
 
 ### Knowledge Growth
 

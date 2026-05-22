@@ -9,9 +9,13 @@ const {
 const { tmpdir } = require("node:os");
 const { join, resolve } = require("node:path");
 const { spawnSync } = require("node:child_process");
-const { upsertManagedBlock } = require("../bin/ai-sdlc.js");
+const {
+  hasAiSdlcAgentsInstructions,
+  upsertManagedBlock,
+} = require("../bin/ai-sdlc.js");
 
 const cli = resolve(__dirname, "..", "bin", "ai-sdlc.js");
+const templateAgents = resolve(__dirname, "..", "templates", "cursor", "AGENTS.md");
 const startMarker = "<!-- ai-sdlc:start -->";
 const endMarker = "<!-- ai-sdlc:end -->";
 
@@ -36,10 +40,19 @@ assert.equal(
   `User\n\n${startMarker}\nNew\n${endMarker}\n`,
 );
 
+assert.equal(hasAiSdlcAgentsInstructions(`${startMarker}\nBlock\n${endMarker}`), true);
+assert.equal(hasAiSdlcAgentsInstructions(readFileSync(templateAgents, "utf8")), true);
+assert.equal(hasAiSdlcAgentsInstructions("Project-only guidance"), false);
+
 const dir = mkdtempSync(join(tmpdir(), "ai-sdlc-test-"));
 
 try {
-  let result = run(["init"], dir);
+  let result = run(["doctor"], dir);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /AGENTS.md exists/);
+  assert.match(result.stdout, /Run: ai-sdlc init/);
+
+  result = run(["init"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   assert.equal(existsSync(join(dir, "AGENTS.md")), true);
   assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), true);
@@ -49,6 +62,10 @@ try {
   assert.match(result.stdout, /Created files: 14/);
   assert.match(result.stdout, /Updated files: 0/);
   assert.match(result.stdout, /Skipped files: 0/);
+
+  result = run(["doctor"], dir);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.match(result.stdout, /AI SDLC installation looks complete/);
 
   result = run(["init"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);

@@ -29,6 +29,7 @@ npm install
 node bin/ai-sdlc.js --help
 node bin/ai-sdlc.js version
 node bin/ai-sdlc.js init
+node bin/ai-sdlc.js doctor
 ```
 
 За замовчуванням `init` копіює `templates/cursor` у поточну директорію і не
@@ -64,3 +65,13 @@ node bin/ai-sdlc.js init --force
 ```bash
 node bin/ai-sdlc.js init --target claude-code
 ```
+
+Щоб перевірити, чи `ai-sdlc` коректно встановлений у репозиторії:
+
+```bash
+node bin/ai-sdlc.js doctor
+```
+
+`doctor` перевіряє `AGENTS.md`, Cursor agents, skills, rules і `specs/`
+scaffold. Якщо щось відсутнє, команда завершується з кодом `1` і пропонує
+запустити `ai-sdlc init`.

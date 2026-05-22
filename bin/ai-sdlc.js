@@ -21,6 +21,7 @@ function printHelp() {
 
 Usage:
   ai-sdlc init [options]     Initialize AI SDLC assets for a project
+  ai-sdlc doctor             Check whether AI SDLC is installed
   ai-sdlc version            Print the ai-sdlc CLI version
   ai-sdlc --help             Show this help message
 
@@ -142,6 +143,116 @@ function installAgentsFile(sourceFile, targetFile) {
   return "updated";
 }
 
+function hasAiSdlcAgentsInstructions(content) {
+  return (
+    content.includes(managedBlockStart) &&
+    content.includes(managedBlockEnd)
+  ) || content.includes("# AI SDLC Agent Instructions");
+}
+
+function doctor() {
+  const checks = [
+    {
+      label: "AGENTS.md exists",
+      path: "AGENTS.md",
+      check: (root) => existsSync(join(root, "AGENTS.md")),
+    },
+    {
+      label: "AGENTS.md contains ai-sdlc instructions",
+      check: (root) => {
+        const agentsPath = join(root, "AGENTS.md");
+        return existsSync(agentsPath) && hasAiSdlcAgentsInstructions(readFileSync(agentsPath, "utf8"));
+      },
+    },
+    {
+      label: ".cursor/agents exists",
+      path: ".cursor/agents",
+      type: "directory",
+    },
+    {
+      label: "agent: diff-analyzer.md",
+      path: ".cursor/agents/diff-analyzer.md",
+    },
+    {
+      label: "agent: spec-matcher.md",
+      path: ".cursor/agents/spec-matcher.md",
+    },
+    {
+      label: "agent: self-healer.md",
+      path: ".cursor/agents/self-healer.md",
+    },
+    {
+      label: "agent: knowledge-grower.md",
+      path: ".cursor/agents/knowledge-grower.md",
+    },
+    {
+      label: "skill: spec-generator",
+      path: ".cursor/skills/spec-generator/SKILL.md",
+    },
+    {
+      label: "skill: e2e-generator",
+      path: ".cursor/skills/e2e-generator/SKILL.md",
+    },
+    {
+      label: "skill: criticality-classifier",
+      path: ".cursor/skills/criticality-classifier/SKILL.md",
+    },
+    {
+      label: "skill: kb-indexer",
+      path: ".cursor/skills/kb-indexer/SKILL.md",
+    },
+    {
+      label: ".cursor/rules exists",
+      path: ".cursor/rules",
+      type: "directory",
+    },
+    {
+      label: "specs/_index.md exists",
+      path: "specs/_index.md",
+    },
+    {
+      label: "specs/_coverage.md exists",
+      path: "specs/_coverage.md",
+    },
+  ];
+  const root = process.cwd();
+  let missing = 0;
+
+  console.log("ai-sdlc doctor");
+  console.log("");
+
+  for (const item of checks) {
+    const ok = typeof item.check === "function" ? item.check(root) : checkPath(root, item.path, item.type);
+    console.log(`${ok ? "[ok]" : "[missing]"} ${item.label}`);
+
+    if (!ok) {
+      missing += 1;
+    }
+  }
+
+  console.log("");
+
+  if (missing === 0) {
+    console.log("AI SDLC installation looks complete.");
+    return;
+  }
+
+  console.log(`AI SDLC installation is incomplete: ${missing} check(s) failed.`);
+  console.log("Run: ai-sdlc init");
+  process.exitCode = 1;
+}
+
+function checkPath(root, targetPath, type = "file") {
+  const fullPath = join(root, targetPath);
+
+  if (!existsSync(fullPath)) {
+    return false;
+  }
+
+  const stats = statSync(fullPath);
+  return type === "directory" ? stats.isDirectory() : stats.isFile();
+}
+
 function init(args) {
   let options;
 
@@ -217,6 +328,11 @@ function main(argv) {
     return;
   }
 
+  if (command === "doctor") {
+    doctor();
+    return;
+  }
+
   console.error(`Unknown command: ${command}`);
   console.error("Run ai-sdlc --help for usage.");
   process.exitCode = 1;
@@ -227,5 +343,6 @@ if (require.main === module) {
 }
 
 module.exports = {
+  hasAiSdlcAgentsInstructions,
   upsertManagedBlock,
 };

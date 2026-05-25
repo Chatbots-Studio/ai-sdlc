@@ -82,12 +82,13 @@ try {
   assert.equal(existsSync(join(dir, "docs", "pr-review-automation.md")), true);
   assert.equal(existsSync(join(dir, "docs", "knowledge-growth-automation.md")), true);
   assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), true);
+  assert.equal(existsSync(join(dir, ".cursor", "agents", "test-runner.md")), true);
 
   let agentsContent = readFileSync(join(dir, "AGENTS.md"), "utf8");
   const firstAgentsContent = agentsContent;
   const agentsMtime = statSync(join(dir, "AGENTS.md")).mtimeMs;
   assert.equal(countMarkers(agentsContent), 1);
-  assert.match(result.stdout, /Created files: 17/);
+  assert.match(result.stdout, /Created files: 18/);
   assert.match(result.stdout, /Updated files: 0/);
   assert.match(result.stdout, /Skipped files: 0/);
 
@@ -106,7 +107,7 @@ try {
   assert.equal(countMarkers(agentsContent), 1);
   assert.equal(readFileSync(installedDiffAnalyzer, "utf8"), "custom agent content\n");
   assert.match(result.stdout, /Updated files: 0/);
-  assert.match(result.stdout, /Skipped files: 17/);
+  assert.match(result.stdout, /Skipped files: 18/);
 
   writeFileSync(
     join(dir, "AGENTS.md"),
@@ -141,7 +142,7 @@ try {
   assert.equal(existsSync(join(dir, ".cursor", "commands", "bootstrap-ai-sdlc.md")), false);
   assert.equal(existsSync(join(dir, ".cursor", "agents", "knowledge-grower.md")), false);
   assert.equal(existsSync(join(dir, "specs", "_index.md")), true);
-  assert.match(result.stdout, /Removed files: 12/);
+  assert.match(result.stdout, /Removed files: 13/);
 
   result = run(["init"], dir);
   assert.equal(result.status, 0, result.stderr || result.stdout);

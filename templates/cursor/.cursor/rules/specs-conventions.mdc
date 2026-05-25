@@ -11,8 +11,8 @@ Specs describe durable behavior, not implementation trivia.
 
 Each module spec should include:
 
-- Frontmatter with module, criticality, owners, last verified date, source, and
-  linked tests.
+- Frontmatter with module, criticality, owners, last review/check date, source,
+  and linked tests.
 - Business context.
 - Invariants.
 - Critical paths.
@@ -24,4 +24,4 @@ Each module spec should include:
 renamed, removed, or reclassified.
 
 `specs/_coverage.md` tracks known test coverage and gaps. Unknown coverage must
-be marked as `unknown` until verified.
+be marked as `unknown` until evidence is recorded.

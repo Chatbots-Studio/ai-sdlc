@@ -6,10 +6,11 @@ Analyze this repository and create the first AI SDLC knowledge base seed.
 
 1. Detect the repository structure, application boundaries, test framework, and
    critical modules.
-2. Create 1-3 seed specs for the most critical modules only.
-3. Update `specs/_index.md`.
-4. Update `specs/_coverage.md`.
-5. Do not modify business code.
+2. Build a proof-backed module map before creating specs.
+3. Create 1-3 seed specs for the most critical modules only.
+4. Update `specs/_index.md`.
+5. Update `specs/_coverage.md`.
+6. Do not modify business code.
 
 ## Priority Order
 
@@ -27,12 +28,24 @@ not contain one of them, skip it.
 ## Constraints
 
 - Do not generate many low-confidence files.
+- Do not create more than 3 seed specs in one run.
 - Prefer 1 high-confidence seed spec over several weak specs.
 - Do not invent business rules.
 - Use existing code, tests, README files, schemas, route definitions, and
   configuration as evidence.
-- If the test framework or test setup is unclear, ask for review before adding
-  e2e tests. Do not create those tests until the reviewer confirms the setup.
+- Do not create e2e tests unless the test framework and startup flow are clear.
+- Prefer TODO coverage notes over speculative tests.
+- Do not write `Critical modules without specs = 0` unless repository scan
+  scope is documented.
+- If the repository is not under git, state that business-code modification
+  cannot be diff-checked.
+- If app, database, or required services were not started, set
+  `runtime_verified: false` in generated specs and report runtime verification
+  as static/test only.
+- Never use `verified` unless a test command, runtime check, or reviewer action
+  was actually executed and recorded.
+- Linked or inspected test files are `test evidence` or `linked-test evidence`,
+  not verified behavior.
 - If confidence is below 80%, document open questions instead of creating a
   speculative spec.
 
@@ -40,25 +53,61 @@ not contain one of them, skip it.
 
 1. Read `AGENTS.md`, `README.md`, package manifests, application entrypoints,
    routes, schemas, data models, and test directories.
-2. Build a short module map.
-3. Use the AI SDLC criticality rules to choose 1-3 seed spec candidates.
-4. For each chosen module, create or update a spec with:
+2. Document repository scan scope, including directories inspected, directories
+   skipped, test locations found, and whether git diff/status is available.
+3. Build a mandatory module map before creating specs. Each module row must
+   include:
+   - module name
+   - source paths
+   - test paths
+   - detected responsibilities
+   - criticality candidate
+   - evidence
+   - selected? why / why not
+4. Verify each selected module has real source paths. If source paths are
+   missing, inspect repository structure again before deciding no spec applies.
+5. Use the AI SDLC criticality rules to choose 1-3 seed spec candidates.
+6. For each chosen module, create or update a spec with:
    - business context
+   - source paths
+   - linked tests
+   - tests discovered
+   - tests executed
+   - test execution evidence
+   - skipped paths for imported or discovered files that are out of scope
+   - evidence references
+   - separate static evidence, test evidence, and runtime evidence
+   - runtime verification status
+   - path accounting section
    - invariants
    - critical paths
    - dependencies
    - open questions
-5. Update `specs/_index.md` with the chosen modules.
-6. Update `specs/_coverage.md` with known coverage and gaps.
-7. Recommend e2e tests only when the framework and setup are clear; otherwise
-   ask for review first.
+7. Before finalizing specs, compare index `Source Paths` against each spec's
+   `source_paths` + `linked_tests` + `skipped_paths`.
+8. If any path is unaccounted, update the spec or add a path accounting warning
+   that names the path and why it remains unresolved.
+9. Update `specs/_index.md` with the chosen modules and source paths.
+10. Update `specs/_coverage.md` with repository scan scope, known coverage, and
+   gaps.
+11. Check whether business code changed:
+   - tracked diff for `src`, `test`, and config files
+   - untracked generated AI-SDLC artifacts
+   - if the repository is not under git, say diff verification is unavailable
+12. Recommend e2e tests only when the framework and setup are clear; otherwise
+   record TODO coverage notes.
 
 ## Output Summary
 
 Return a concise summary with:
 
-- detected modules
-- chosen seed specs
+- Module map
+- Selected seed specs
+- Skipped candidate modules
+- Business-code mutation check
+- Runtime verification status
+- Path accounting warnings
+- repository scan scope
 - confidence per seed spec
 - files created or updated
 - test framework confidence

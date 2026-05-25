@@ -26,8 +26,8 @@ reusable skills, rules, a bootstrap command, and a `specs/` scaffold.
 ## What It Installs
 
 - `AGENTS.md` instructions for AI SDLC behavior.
-- Cursor agents for diff analysis, spec matching, self-healing, and knowledge
-  growth.
+- Cursor agents for diff analysis, spec matching, test selection/execution,
+  self-healing, and knowledge growth.
 - Cursor skills for spec generation, e2e test generation, criticality
   classification, and knowledge base indexing.
 - Cursor rules for core behavior, specs conventions, and test conventions.
@@ -72,12 +72,14 @@ The prompt lives at:
 .cursor/commands/bootstrap-ai-sdlc.md
 ```
 
-It asks Cursor to analyze the repository, choose 1-3 critical seed modules,
-create initial specs, update `specs/_index.md`, update `specs/_coverage.md`,
-and avoid business-code changes.
+It asks Cursor to analyze the repository, document scan scope, build a module
+map, choose 1-3 critical seed modules, create initial specs, update
+`specs/_index.md`, update `specs/_coverage.md`, and avoid business-code
+changes.
 
-If the test framework is unclear, the bootstrap prompt asks for review before
-adding e2e tests.
+The bootstrap prompt does not create e2e tests unless the test framework and
+startup flow are clear. When they are unclear, it records TODO coverage notes
+instead of speculative tests.
 
 Optional manual Cursor Cloud and GitHub-connected automation setup is described
 in [docs/cursor-automations.md](docs/cursor-automations.md). v0.1 does not
@@ -138,6 +140,7 @@ AGENTS.md
   agents/
     diff-analyzer.md
     spec-matcher.md
+    test-runner.md
     self-healer.md
     knowledge-grower.md
   skills/
@@ -179,8 +182,9 @@ coverage gaps.
 ### Spec-Aware PR Review
 
 `@diff-analyzer` identifies affected modules. `@spec-matcher` checks changes
-against known specs and invariants. In v0.1 this is installed as local Cursor
-agent guidance, not as an automatic PR trigger.
+against known specs and invariants. `@test-runner` selects and runs relevant
+tests only when commands and runtime setup are clear. In v0.1 this is installed
+as local Cursor agent guidance, not as an automatic PR trigger.
 
 ### Self-Healing Tests
 

@@ -29,6 +29,14 @@ review, or escalation.
 - `low`: cosmetic UI, docs, comments, local developer tooling, isolated tests,
   or low-risk refactors.
 
+Use `low` for demos, generated archetype code, isolated CLI samples, comments,
+or tooling with no durable product contract.
+
+Use `medium` only when behavior is user-visible or expected to remain stable.
+
+Use `high` or `critical` only for auth, money, user data, security, critical
+business rules, external side effects, or production-impacting flows.
+
 ## Process
 
 1. Check whether the module is already listed in `specs/_index.md`.
@@ -37,14 +45,40 @@ review, or escalation.
 4. Identify security, data integrity, and compliance implications.
 5. Return the level with evidence and confidence.
 
+## NestJS Auth/Security Checklist
+
+For NestJS auth/security modules, inspect these paths when present:
+
+- controllers
+- services
+- modules
+- strategies
+- guards
+- interceptors
+- serializers
+- DTOs
+- decorators
+- entities
+- migrations
+- factories
+- seeders
+- e2e tests
+
+Imported entities or providers should either be included in `source_paths` or
+explicitly listed in `skipped_paths` / `out_of_scope_paths` by the
+spec-generator.
+
 ## Output
 
 ```json
 {
+  "module": "name",
+  "source_paths": ["path"],
   "criticality": "critical|high|medium|low",
   "reasons": ["Evidence-backed reason."],
-  "recommended_action": "create_spec|update_spec|run_tests|metadata_only|escalate",
-  "confidence": 0.9
+  "negative_evidence": ["Why higher levels do not apply."],
+  "confidence": 0.9,
+  "recommended_action": "create_spec|update_spec|run_tests|metadata_only|escalate"
 }
 ```
 

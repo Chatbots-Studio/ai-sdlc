@@ -9,7 +9,8 @@ the CLI does not create Cursor Cloud automations or GitHub integrations.
 
 1. Run `@diff-analyzer`.
 2. Run `@spec-matcher` for affected specs.
-3. Run tests if a clear test command is configured and available.
+3. Run `@test-runner` to select and run tests if a clear test command is
+   configured and available.
 4. Escalate when confidence is low or behavior is unclear.
 
 ## Copy-Paste Cursor Automation Instruction
@@ -23,9 +24,9 @@ affected specs.
 Then run @spec-matcher for every affected spec. Check whether the diff violates
 or weakens any invariant, critical path, or documented decision.
 
-If this repository has a clear test command and the automation environment can
-run it, run the narrowest relevant tests for affected modules. If test setup is
-unclear, do not guess and do not invent commands.
+Then run @test-runner. If this repository has a clear test command and the
+automation environment can run it, run the narrowest relevant tests for affected
+modules. If test setup is unclear, do not guess and do not invent commands.
 
 Return a PR review summary with:
 - changed modules

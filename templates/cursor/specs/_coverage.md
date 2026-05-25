@@ -24,7 +24,7 @@ report numeric zero for missing critical modules.
 
 | Module | Source Coverage | Critical Paths | Test Coverage | Evidence | Gaps | Last Checked |
 | --- | --- | --- | --- | --- | --- | --- |
-| example-module | unknown | unknown | unknown | static: path/to/source.ext:line; test: path/to/test.ext:line; test execution: none; runtime: none | Replace example during bootstrap. | YYYY-MM-DD |
+| example-module | unknown | unknown | unknown | static: path/to/source.ext:line; test: path/to/test.ext:line; test execution: none; visual artifacts: none; runtime: none | Replace example during bootstrap. | YYYY-MM-DD |
 
 The example row is illustrative only. Replace it with real repository modules
 or remove it during bootstrap.
@@ -36,4 +36,6 @@ Status values: `draft`, `draft: path-accounting-warning`, `reviewed`,
 
 Never use `verified` unless a test command, runtime check, or reviewer action
 was actually executed and recorded. Linked or inspected test files are
-`test evidence` or `linked-test evidence`, not verified behavior.
+`test evidence` or `linked-test evidence`, not verified behavior. UI, browser,
+visual, and e2e runtime evidence must include screenshot or video artifact paths
+when the framework supports them.

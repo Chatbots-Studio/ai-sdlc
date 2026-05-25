@@ -27,7 +27,8 @@ are reviewed by a module owner.
 4. If source paths are missing, inspect repository structure before concluding
    that no spec applies.
 5. Run `@test-runner` to select and execute relevant tests when the command and
-   runtime setup are clear.
+   runtime setup are clear. UI, browser, visual, and e2e test runs must include
+   screenshot or video artifact paths when the framework supports them.
 6. If tests fail, use `@self-healer` only for conservative fixes.
 7. Escalate when confidence is low or business logic is risky.
 
@@ -54,6 +55,8 @@ When escalating, include:
 - What changed.
 - Which spec, invariant, or critical path may be affected.
 - What tests ran and their results.
+- Screenshot or video artifact paths for UI and e2e tests, or why artifacts are
+  missing.
 - What was attempted.
 - Why confidence is below threshold.
 - The recommended next action.

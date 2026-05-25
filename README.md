@@ -183,8 +183,10 @@ coverage gaps.
 
 `@diff-analyzer` identifies affected modules. `@spec-matcher` checks changes
 against known specs and invariants. `@test-runner` selects and runs relevant
-tests only when commands and runtime setup are clear. In v0.1 this is installed
-as local Cursor agent guidance, not as an automatic PR trigger.
+tests only when commands and runtime setup are clear. For UI, browser, visual,
+and e2e tests, it requires screenshot or video artifacts when the existing
+framework supports them. In v0.1 this is installed as local Cursor agent
+guidance, not as an automatic PR trigger.
 
 ### Self-Healing Tests
 

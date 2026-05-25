@@ -46,6 +46,9 @@ not contain one of them, skip it.
   was actually executed and recorded.
 - Linked or inspected test files are `test evidence` or `linked-test evidence`,
   not verified behavior.
+- For UI, browser, visual, and e2e tests, runtime evidence must include
+  screenshot or video artifact paths when the framework supports them. If
+  artifacts are unavailable, state why.
 - If confidence is below 80%, document open questions instead of creating a
   speculative spec.
 
@@ -74,6 +77,7 @@ not contain one of them, skip it.
    - tests discovered
    - tests executed
    - test execution evidence
+   - screenshot/video artifacts for UI or e2e test execution
    - skipped paths for imported or discovered files that are out of scope
    - evidence references
    - separate static evidence, test evidence, and runtime evidence

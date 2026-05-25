@@ -24,6 +24,8 @@ or remove it during bootstrap.
   inspected tests; test execution is not implied.
 - `runtime verified`: accepted with runtime evidence from an app, database,
   service, or command run.
+- UI, browser, visual, and e2e runtime evidence must include screenshot or
+  video artifact paths when the framework supports them.
 - `stale`: code changed and spec needs verification.
 - `example`: illustrative placeholder.
 

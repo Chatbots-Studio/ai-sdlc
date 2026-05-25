@@ -7,6 +7,9 @@ The CLI does not create automations, GitHub webhooks, GitHub Actions, or Cursor
 Cloud configuration. Copy these instructions into Cursor Automation settings
 only when your workspace already supports that workflow.
 
+For Cursor Team onboarding, repository environment setup, and smoke-test
+prompts, see [cursor-cloud-team-setup.md](cursor-cloud-team-setup.md).
+
 ## PR Opened Or Updated
 
 Use this workflow when a pull request is opened, reopened, synchronized, or

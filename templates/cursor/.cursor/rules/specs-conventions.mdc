@@ -1,0 +1,27 @@
+---
+description: Conventions for AI SDLC specs.
+globs:
+  - "specs/**/*.md"
+alwaysApply: false
+---
+
+# Specs Conventions
+
+Specs describe durable behavior, not implementation trivia.
+
+Each module spec should include:
+
+- Frontmatter with module, criticality, owners, last verified date, source, and
+  linked tests.
+- Business context.
+- Invariants.
+- Critical paths.
+- Dependencies.
+- Decisions.
+- Open questions when confidence is low.
+
+`specs/_index.md` is the registry and must be updated when specs are added,
+renamed, removed, or reclassified.
+
+`specs/_coverage.md` tracks known test coverage and gaps. Unknown coverage must
+be marked as `unknown` until verified.

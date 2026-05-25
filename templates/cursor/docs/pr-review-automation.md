@@ -10,7 +10,8 @@ the CLI does not create Cursor Cloud automations or GitHub integrations.
 1. Run `@diff-analyzer`.
 2. Run `@spec-matcher` for affected specs.
 3. Run `@test-runner` to select and run tests if a clear test command is
-   configured and available.
+   configured and available. For UI, browser, visual, or e2e tests, require a
+   screenshot or video artifact when the framework supports it.
 4. Escalate when confidence is low or behavior is unclear.
 
 ## Copy-Paste Cursor Automation Instruction
@@ -26,13 +27,17 @@ or weakens any invariant, critical path, or documented decision.
 
 Then run @test-runner. If this repository has a clear test command and the
 automation environment can run it, run the narrowest relevant tests for affected
-modules. If test setup is unclear, do not guess and do not invent commands.
+modules. For UI, browser, visual, or e2e tests, capture screenshot or video
+artifacts using existing framework support. If visual artifacts cannot be
+captured, report why and do not claim visual verification. If test setup is
+unclear, do not guess and do not invent commands.
 
 Return a PR review summary with:
 - changed modules
 - affected specs
 - invariant checks
 - tests run and results
+- screenshot/video artifact paths for UI or e2e tests
 - confidence score
 - escalation notes
 

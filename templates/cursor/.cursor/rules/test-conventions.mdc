@@ -20,6 +20,10 @@ Agents must:
 - Include regression tests for bugs that become invariants.
 - Avoid weakening assertions to make tests pass.
 - Run the narrowest relevant test command when possible.
+- For UI, browser, visual, and e2e tests, capture screenshot or video artifacts
+  when the existing framework supports it.
+- Report artifact paths with test evidence. If visual artifacts cannot be
+  captured, state the reason and avoid claiming visual verification.
 
 If the repository has no clear test pattern, propose a test plan and escalate
 instead of introducing a large new framework.

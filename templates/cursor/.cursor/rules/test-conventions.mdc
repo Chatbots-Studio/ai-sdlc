@@ -1,0 +1,29 @@
+---
+description: Conventions for tests generated from AI SDLC specs.
+globs:
+  - "**/*.spec.*"
+  - "**/*.test.*"
+  - "e2e/**/*"
+  - "tests/**/*"
+alwaysApply: false
+---
+
+# Test Conventions
+
+Generated tests must follow existing repository patterns.
+
+Agents must:
+
+- Inspect current test helpers, fixtures, setup, and teardown first.
+- Link tests to specs with a `spec-ref` comment when practical.
+- Cover critical paths from the related spec.
+- Include regression tests for bugs that become invariants.
+- Avoid weakening assertions to make tests pass.
+- Run the narrowest relevant test command when possible.
+- For UI, browser, visual, and e2e tests, capture screenshot or video artifacts
+  when the existing framework supports it.
+- Report artifact paths with test evidence. If visual artifacts cannot be
+  captured, state the reason and avoid claiming visual verification.
+
+If the repository has no clear test pattern, propose a test plan and escalate
+instead of introducing a large new framework.

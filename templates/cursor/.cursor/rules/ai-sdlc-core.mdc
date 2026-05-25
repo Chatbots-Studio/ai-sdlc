@@ -1,0 +1,21 @@
+---
+description: Core AI SDLC behavior for Cursor agents.
+alwaysApply: true
+---
+
+# AI SDLC Core
+
+The repository is the source of truth for code, specs, tests, and decisions.
+
+Agents must:
+
+- Read `specs/_index.md` before judging behavior.
+- Treat `specs/` as a living knowledge base.
+- Preserve spec invariants unless an owner explicitly changes them.
+- Use confidence-driven behavior.
+- Escalate when confidence is below `80%`.
+- Prefer minimal, evidence-backed changes.
+- Avoid project-specific assumptions not present in the repository.
+
+On merged changes, run or recommend `@knowledge-grower` so the knowledge base
+keeps improving.

@@ -82,8 +82,9 @@ startup flow are clear. When they are unclear, it records TODO coverage notes
 instead of speculative tests.
 
 Optional manual Cursor Cloud and GitHub-connected automation setup is described
-in [docs/cursor-automations.md](docs/cursor-automations.md). v0.1 does not
-create automations through the CLI.
+in [docs/cursor-cloud-team-setup.md](docs/cursor-cloud-team-setup.md) and
+[docs/cursor-automations.md](docs/cursor-automations.md). v0.1 does not create
+automations through the CLI.
 
 ## Commands
 

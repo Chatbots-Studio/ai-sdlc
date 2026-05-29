@@ -2,8 +2,8 @@
 
 Manual Cursor Automation template for PR merged events.
 
-This file is documentation only. ai-sdlc v0.1 installs it for copy-paste setup;
-the CLI does not create Cursor Cloud automations or GitHub integrations.
+This file is documentation only. The ai-sdlc pack ships it for copy-paste setup;
+it does not create Cursor Cloud automations or GitHub integrations.
 
 ## Workflow
 

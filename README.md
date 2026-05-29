@@ -1,230 +1,111 @@
 # ai-sdlc
 
-Installable Cursor-first toolkit for Self-Healing AI-Driven SDLC.
+A Cursor-first pack for a **Self-Healing AI-Driven SDLC**.
 
-v0.1 installs local Cursor assets into a repository: agents, skills, rules,
-commands, and specs templates. It does not provide automatic Cursor Cloud,
-GitHub, or marketplace integration yet.
+This repository is read-only. Attach it in Cursor and the agents, skills,
+rules, and commands become available in your projects. There is **no install
+step** — nothing is copied into your repository.
+
+🇺🇦 [Читати українською](README.ua.md)
 
 ## What Is ai-sdlc?
 
-`ai-sdlc` adds a repeatable AI engineering workflow to any repository.
+`ai-sdlc` adds a repeatable AI engineering workflow on top of any repository.
 
-The goal is to help Cursor agents review changes against repository-owned
-specs, grow those specs over time, propose tests for critical behavior, and
-escalate when confidence is low.
+The idea: the repository itself is the source of truth. Cursor agents review
+changes against repository-owned specs, grow those specs over time, propose
+tests for critical behavior, run the right tests, and escalate when confidence
+is low instead of guessing.
 
-In v0.1, the product is a local Cursor toolkit and bootstrap workflow:
+## How To Use It
 
-```bash
-ai-sdlc init
-```
+1. In Cursor, attach this repository (`Chatbots-Studio/ai-sdlc`).
+2. Open your target project.
+3. Run the bootstrap command once to seed specs (see below).
+4. Invoke the agents (`@diff-analyzer`, `@spec-matcher`, `@test-runner`, …) on
+   your changes.
 
-After installation, Cursor has project instructions, specialized agents,
-reusable skills, rules, a bootstrap command, and a `specs/` scaffold.
+Team / Background Agent setup is in
+[docs/cursor-cloud-team-setup.md](docs/cursor-cloud-team-setup.md).
 
-## What It Installs
+## Bootstrap
 
-- `AGENTS.md` instructions for AI SDLC behavior.
-- Cursor agents for diff analysis, spec matching, test selection/execution,
-  self-healing, and knowledge growth.
-- Cursor skills for spec generation, e2e test generation, criticality
-  classification, and knowledge base indexing.
-- Cursor rules for core behavior, specs conventions, and test conventions.
-- A Cursor command for bootstrapping the first repository specs.
-- `specs/_index.md` and `specs/_coverage.md` starter files.
-- Optional manual Cursor/GitHub automation documentation templates.
-
-## Quick Start
-
-From this package repository:
-
-```bash
-npm install
-node bin/ai-sdlc.js --help
-node bin/ai-sdlc.js init
-node bin/ai-sdlc.js doctor
-```
-
-From an installed package later:
-
-```bash
-npx ai-sdlc init
-npx ai-sdlc doctor
-```
-
-By default, `init` installs Cursor templates into the current working
-directory and does not overwrite existing user files.
-
-## Cursor Usage
-
-After running `ai-sdlc init`, open the target repository in Cursor.
-
-Run the installed bootstrap command:
+Run the bootstrap command in a new repository:
 
 ```txt
 bootstrap-ai-sdlc
 ```
 
-The prompt lives at:
+It asks Cursor to scan the repository, build a module map, pick 1-3 critical
+seed modules, create initial specs, and update `specs/_index.md` and
+`specs/_coverage.md` — without touching business code. It only proposes e2e
+tests when the test framework and startup flow are clear; otherwise it records
+TODO coverage notes.
 
-```txt
-.cursor/commands/bootstrap-ai-sdlc.md
-```
+## Agents
 
-It asks Cursor to analyze the repository, document scan scope, build a module
-map, choose 1-3 critical seed modules, create initial specs, update
-`specs/_index.md`, update `specs/_coverage.md`, and avoid business-code
-changes.
+Located in `.cursor/agents/`. Invoke with `@name`.
 
-The bootstrap prompt does not create e2e tests unless the test framework and
-startup flow are clear. When they are unclear, it records TODO coverage notes
-instead of speculative tests.
+| Agent | When to use | What it does |
+| --- | --- | --- |
+| `@diff-analyzer` | Start of any review | Parses the diff, classifies changed files, maps them to affected specs and modules. Read-only. |
+| `@spec-matcher` | After diff-analyzer | Checks the diff against known spec invariants and critical paths, flags violations. Read-only. |
+| `@test-runner` | When tests are needed | Selects the narrowest useful tests and runs them only when the command and runtime are clear. Requires screenshot/video artifacts for UI/browser/e2e tests, or states why they are impossible. |
+| `@self-healer` | When tests fail | Conservatively diagnoses failures and applies only high-confidence fixes. Max 3 attempts, escalates below 80% confidence, never auto-fixes risky business logic. |
+| `@knowledge-grower` | After a PR is merged | The primary agent. Decides whether the change needs a new spec, a spec update, new regression coverage, or only coverage metadata — this is what makes the repo smarter over time. |
 
-Optional manual Cursor Cloud and GitHub-connected automation setup is described
-in [docs/cursor-cloud-team-setup.md](docs/cursor-cloud-team-setup.md) and
-[docs/cursor-automations.md](docs/cursor-automations.md). v0.1 does not create
-automations through the CLI.
+## Skills
 
-## Commands
+Located in `.cursor/skills/`. Used by the agents (or directly) for focused
+subtasks.
 
-### `ai-sdlc init`
+| Skill | Use when |
+| --- | --- |
+| `spec-generator` | A new spec or spec update is needed for behavior that must stay stable. |
+| `e2e-generator` | A critical path has no test coverage, or a bugfix should become a regression test. |
+| `criticality-classifier` | Deciding whether a change needs specs, stronger tests, human review, or escalation. |
+| `kb-indexer` | Specs, tests, ownership, criticality, or coverage metadata changed and `specs/_index.md` / `specs/_coverage.md` must be updated. |
 
-Installs the Cursor toolkit into the current directory.
+## Rules
 
-```bash
-node bin/ai-sdlc.js init
-node bin/ai-sdlc.js init --target cursor
-node bin/ai-sdlc.js init --force
-```
+Always-on / scoped guidance in `.cursor/rules/`:
 
-Only `cursor` is supported in v0.1. Other targets fail with a clean error.
-
-`--force` overwrites regular managed template files, but `AGENTS.md` is still
-handled safely through a managed block.
-
-### `ai-sdlc doctor`
-
-Checks whether ai-sdlc appears to be installed correctly.
-
-```bash
-node bin/ai-sdlc.js doctor
-```
-
-It verifies `AGENTS.md`, Cursor agents, skills, rules, the bootstrap command,
-and specs scaffold. It exits with code `0` when complete and code `1` when
-something is missing.
-
-### `ai-sdlc uninstall`
-
-Removes managed ai-sdlc Cursor files.
-
-```bash
-node bin/ai-sdlc.js uninstall
-node bin/ai-sdlc.js uninstall --include-specs
-```
-
-Default uninstall removes installed commands, agents, skills, and rules. It
-removes only the managed ai-sdlc block from `AGENTS.md`.
-
-`specs/` is preserved by default. `--include-specs` removes only
-`specs/_index.md` and `specs/_coverage.md` when they still match the original
-placeholder templates.
-
-## Installed File Structure
-
-```txt
-AGENTS.md
-.cursor/
-  commands/
-    bootstrap-ai-sdlc.md
-  agents/
-    diff-analyzer.md
-    spec-matcher.md
-    test-runner.md
-    self-healer.md
-    knowledge-grower.md
-  skills/
-    spec-generator/SKILL.md
-    e2e-generator/SKILL.md
-    criticality-classifier/SKILL.md
-    kb-indexer/SKILL.md
-  rules/
-    ai-sdlc-core.mdc
-    specs-conventions.mdc
-    test-conventions.mdc
-docs/
-  pr-review-automation.md
-  knowledge-growth-automation.md
-specs/
-  _index.md
-  _coverage.md
-```
+- `ai-sdlc-core.mdc` — core behavior; repo is the source of truth (always on).
+- `specs-conventions.mdc` — how specs are written (applies under `specs/`).
+- `test-conventions.mdc` — how generated tests are written (applies to test files).
 
 ## Core Concepts
 
-### Repo As Source Of Truth
+- **Repo as source of truth** — code, specs, tests, and decisions live in the
+  repository so an agent can reason about behavior.
+- **Living specs** — `specs/` is a knowledge base, not static docs: critical
+  modules, invariants, critical paths, owners, linked tests, open questions.
+- **Spec-aware review** — `@diff-analyzer` → `@spec-matcher` → `@test-runner`.
+- **Self-healing tests** — `@self-healer` proposes conservative fixes only.
+- **Confidence-driven escalation** — agents proceed on strong evidence and
+  escalate with context otherwise. See thresholds in [AGENTS.md](AGENTS.md).
 
-The repository should contain the code, specs, tests, and decisions needed for
-an AI agent to reason about behavior.
+## Repository Layout
 
-### Living Specs
-
-`specs/` is a knowledge base, not static documentation. Specs should describe
-critical modules, invariants, critical paths, owners, linked tests, and open
-questions.
-
-### Knowledge Grower
-
-`@knowledge-grower` is the main agent. It analyzes merged or reviewed work and
-decides whether to create specs, update specs, record decisions, or flag test
-coverage gaps.
-
-### Spec-Aware PR Review
-
-`@diff-analyzer` identifies affected modules. `@spec-matcher` checks changes
-against known specs and invariants. `@test-runner` selects and runs relevant
-tests only when commands and runtime setup are clear. For UI, browser, visual,
-and e2e tests, it requires screenshot or video artifacts when the existing
-framework supports them. In v0.1 this is installed as local Cursor agent
-guidance, not as an automatic PR trigger.
-
-### Self-Healing Tests
-
-`@self-healer` is conservative. It can diagnose failing tests and propose small
-fixes, but it should not auto-change risky business logic or weaken assertions.
-
-### Confidence-Driven Escalation
-
-Agents should proceed only when evidence is strong. Low-confidence behavior,
-unclear business rules, and risky fixes should be escalated with context.
-
-## Safety Model
-
-- No overwrite by default for regular files.
-- Existing `AGENTS.md` content is preserved.
-- ai-sdlc instructions are inserted between:
-
-```md
-<!-- ai-sdlc:start -->
-...
-<!-- ai-sdlc:end -->
+```txt
+AGENTS.md                 Agent operating instructions and confidence rules
+.cursor/
+  agents/                 diff-analyzer, spec-matcher, test-runner, self-healer, knowledge-grower
+  skills/                 spec-generator, e2e-generator, criticality-classifier, kb-indexer
+  rules/                  ai-sdlc-core, specs-conventions, test-conventions
+  commands/               bootstrap-ai-sdlc
+specs/                    _index.md, _coverage.md knowledge-base scaffold
+docs/                     setup and automation documentation
 ```
-
-- Re-running `init` updates the managed block instead of duplicating it.
-- `--force` still updates only the managed block in `AGENTS.md`.
-- `@self-healer` is instructed to avoid risky business-logic auto-fixes.
-- `specs/` is preserved on uninstall by default.
 
 ## Roadmap
 
-- Cursor local toolkit and bootstrap workflow.
-- Cursor Cloud automation documentation and setup flow.
+- Cursor Cloud automation setup flow.
 - GitHub automation templates.
 - Multi-agent support for Claude Code, Codex, Windsurf, and other environments.
 - Marketplace-ready distribution.
 
 ## Blueprint
 
-The implementation is based on the broader
+Based on the broader
 [Self-Healing AI-Driven SDLC blueprint](self-healing-sdlc-blueprint.md).

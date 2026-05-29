@@ -1,88 +1,71 @@
 # Cursor Cloud Team Setup
 
-This repository is ready for Cursor Background Agents after a Cursor Team admin
-connects the GitHub repository in Cursor.
+This repository is a read-only AI SDLC pack. Cursor pulls the agents, skills,
+rules, and commands directly from the repository root. There is no install step
+and nothing is copied into your project.
 
 ## What Is Already In This Repository
 
-- `.cursor/environment.json` defines the remote agent install command.
-- `package.json` exposes `npm test`, `ai-sdlc init`, `ai-sdlc doctor`, and
-  `ai-sdlc uninstall` checks.
-- `templates/cursor/` contains the Cursor agents, rules, skills, docs, and
-  specs scaffold installed by `ai-sdlc init`.
-- `docs/cursor-automations.md` contains copy-paste prompts for PR review and
+- `.cursor/agents/` — the AI SDLC agents (diff-analyzer, spec-matcher,
+  test-runner, self-healer, knowledge-grower).
+- `.cursor/skills/` — supporting skills (spec-generator, e2e-generator,
+  kb-indexer, criticality-classifier).
+- `.cursor/rules/` — always-on rules for the AI SDLC workflow.
+- `.cursor/commands/bootstrap-ai-sdlc.md` — bootstrap command for a new repo.
+- `AGENTS.md` — agent operating instructions and confidence rules.
+- `specs/` — living knowledge base scaffold (`_index.md`, `_coverage.md`).
+- `docs/cursor-automations.md` — copy-paste prompts for PR review and
   knowledge-growth automations.
+
+## How To Use It
+
+Attach this repository in Cursor. Cursor exposes its agents and skills in any
+project where you invoke them. The pack is project-agnostic; the examples in the
+specs and agent output must be replaced with the real modules of the target
+repository.
 
 ## What A Cursor Team Admin Must Do
 
 1. Open the Cursor Team dashboard.
 2. Confirm team privacy settings and usage-based pricing.
 3. Connect GitHub in Cursor integrations.
-4. Grant Cursor read/write access to `Chatbots-Studio/ai-sdlc`.
+4. Grant Cursor read access to `Chatbots-Studio/ai-sdlc` (the repo is public and
+   read-only for the pack).
 5. If the GitHub organization uses an IP allowlist, add Cursor Background Agent
    access according to Cursor's GitHub integration instructions.
-6. In Cursor Background Agents settings, use:
-   - repository: `Chatbots-Studio/ai-sdlc`
-   - base branch: `main`
-   - environment: repository `.cursor/environment.json`
-7. Optional: install the Cursor Slack app and set the default repository to
-   `Chatbots-Studio/ai-sdlc`.
+6. Attach `Chatbots-Studio/ai-sdlc` so its agents and skills are available.
+7. Optional: install the Cursor Slack app to launch Background Agents from Slack.
 
 ## Smoke Test Prompt
 
-Run this as the first Cursor Background Agent task:
+Run this in a target project after attaching the pack:
 
 ```txt
-Check whether this repository is ready for ai-sdlc package testing.
+Use the ai-sdlc pack on this repository.
 
 Do not change business logic.
 
-Run:
-- npm install
-- npm test
-- node bin/ai-sdlc.js doctor
+Steps:
+- run @diff-analyzer on the current diff
+- run @spec-matcher for any affected specs
+- run @test-runner for relevant tests
 
 Then create a short report that includes:
-- commands run
-- exit codes
-- whether .cursor/environment.json was used
-- whether ai-sdlc templates include test-runner visual artifact requirements
+- which agents and skills were available
+- commands run and exit codes
+- whether UI/e2e tests produced screenshot or video artifacts
 - any blockers for Cursor Team usage
 ```
 
 Expected result:
 
-- Agent starts from `main`.
-- Dependencies install with `npm install`.
-- `npm test` passes.
-- `doctor` may report missing installed project assets when run directly in this
-  package repository. That is acceptable unless the agent first runs
-  `node bin/ai-sdlc.js init` in a temporary target repository.
-- Agent summary mentions that UI/e2e tests require screenshot or video
+- The ai-sdlc agents and skills are discoverable from the attached repo.
+- The agent summary mentions that UI/e2e tests require screenshot or video
   artifacts when the existing framework supports them.
-
-## Optional End-To-End Package Test Prompt
-
-Use this after the smoke test succeeds:
-
-```txt
-Test ai-sdlc installation in a temporary target repository.
-
-Do not modify source package files unless a real bug is found.
-
-Steps:
-- create a temp directory outside this repo
-- run node /path/to/this/repo/bin/ai-sdlc.js init in that temp directory
-- run node /path/to/this/repo/bin/ai-sdlc.js doctor in that temp directory
-- run init again and confirm it is idempotent
-- run uninstall and confirm managed files are removed
-
-Report commands, exit codes, files created, files skipped, and any blockers.
-```
 
 ## Current Limitations
 
-- The CLI does not create Cursor Team settings, GitHub webhooks, Slack
+- The pack does not create Cursor Team settings, GitHub webhooks, Slack
   integrations, or Cursor automations.
 - Cursor Team connection must be done by a user with Team and GitHub
   integration permissions.

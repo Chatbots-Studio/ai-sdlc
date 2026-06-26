@@ -123,27 +123,29 @@ flowchart TB
 repo/
 ├── AGENTS.md                         # Головні інструкції для агента
 │
-├── .cursor/
-│   ├── agents/                       # Custom Subagents
-│   │   ├── diff-analyzer.md          # @diff-analyzer
-│   │   ├── spec-matcher.md           # @spec-matcher  
-│   │   ├── test-runner.md            # @test-runner
-│   │   ├── self-healer.md            # @self-healer
-│   │   └── knowledge-grower.md       # @knowledge-grower (ключовий!)
-│   │
-│   ├── skills/                       # Agent Skills (on-demand)
-│   │   ├── spec-generator/
-│   │   │   └── SKILL.md              # генерація spec з коду/PR
-│   │   ├── e2e-generator/
-│   │   │   └── SKILL.md              # генерація e2e тесту з spec
-│   │   └── criticality-classifier/
-│   │       └── SKILL.md              # визначення критичності модуля
-│   │
-│   ├── rules/                        # Static rules (always-on context)
-│   │   ├── coding-standards.mdc      # конвенції коду
-│   │   └── test-conventions.mdc      # конвенції тестів
-│   │
-│   └── plans/                        # збережені плани агентів
+├── .cursor-plugin/
+│   └── marketplace.json              # Cursor team marketplace manifest
+│
+├── plugins/
+│   └── ai-sdlc/                      # Cursor plugin (42flows.tech)
+│       ├── .cursor-plugin/plugin.json
+│       ├── agents/                   # Custom Subagents (@name)
+│       │   ├── diff-analyzer.md
+│       │   ├── spec-matcher.md
+│       │   ├── test-runner.md
+│       │   ├── self-healer.md
+│       │   └── knowledge-grower.md   # ключовий!
+│       ├── skills/                   # Agent Skills (on-demand)
+│       │   ├── spec-generator/SKILL.md
+│       │   ├── e2e-generator/SKILL.md
+│       │   ├── criticality-classifier/SKILL.md
+│       │   └── kb-indexer/SKILL.md
+│       ├── rules/                    # Static rules (always-on context)
+│       │   ├── ai-sdlc-core.mdc
+│       │   ├── specs-conventions.mdc
+│       │   └── test-conventions.mdc
+│       └── commands/
+│           └── bootstrap-ai-sdlc.md
 │
 ├── specs/                            # Living Knowledge Base (SELF-GROWING)
 │   ├── _index.md                     # автогенерований реєстр модулів
@@ -208,7 +210,7 @@ This is the MOST IMPORTANT workflow — it makes the system smarter over time.
 - PR without passing e2e for affected critical modules = blocked
 ```
 
-### .cursor/agents/diff-analyzer.md
+### plugins/ai-sdlc/agents/diff-analyzer.md
 
 ```markdown
 ---
@@ -245,7 +247,7 @@ Return JSON:
 }
 ```
 
-### .cursor/agents/spec-matcher.md
+### plugins/ai-sdlc/agents/spec-matcher.md
 
 ```markdown
 ---
@@ -286,7 +288,7 @@ Verify that PR changes don't violate any specification invariants.
 }
 ```
 
-### .cursor/agents/self-healer.md
+### plugins/ai-sdlc/agents/self-healer.md
 
 ```markdown
 ---
@@ -339,7 +341,7 @@ Post to PR AND Slack:
 - < 80% → ESCALATE immediately, do not attempt fix
 ```
 
-### .cursor/agents/knowledge-grower.md (КЛЮЧОВИЙ АГЕНТ)
+### plugins/ai-sdlc/agents/knowledge-grower.md (КЛЮЧОВИЙ АГЕНТ)
 
 ```markdown
 ---
@@ -452,7 +454,7 @@ After each run, store:
 This improves future runs via Cursor Memory tool.
 ```
 
-### .cursor/skills/spec-generator/SKILL.md
+### plugins/ai-sdlc/skills/spec-generator/SKILL.md
 
 ```markdown
 ---
@@ -522,7 +524,7 @@ source_pr: #{pr_number}
 | {date} | #{pr} | Initial spec |
 ```
 
-### .cursor/skills/e2e-generator/SKILL.md
+### plugins/ai-sdlc/skills/e2e-generator/SKILL.md
 
 ```markdown
 ---
@@ -607,8 +609,8 @@ test.describe('{Module} - Critical Paths', () => {
 
 1. Вручну створити spec для 1 найкритичнішого модуля (як seed/приклад)
    - Cursor Agent аналізує код і генерує драфт, ти апрувиш
-2. Створити `.cursor/agents/knowledge-grower.md` (описаний вище)
-3. Створити `.cursor/skills/spec-generator/` та `.cursor/skills/e2e-generator/`
+2. Створити `plugins/ai-sdlc/agents/knowledge-grower.md` (описаний вище)
+3. Створити `plugins/ai-sdlc/skills/spec-generator/` та `plugins/ai-sdlc/skills/e2e-generator/`
 4. Налаштувати Cursor Automation:
    - Тригер: PR merged
    - Інструкція: "Invoke @knowledge-grower for this merged PR"
@@ -659,7 +661,7 @@ test.describe('{Module} - Critical Paths', () => {
 
 **Дії:**
 
-1. Створити `.cursor/agents/self-healer.md` (описаний вище)
+1. Створити `plugins/ai-sdlc/agents/self-healer.md` (описаний вище)
 2. Інтегрувати в PR Automation flow: тест впав → викликати @self-healer
 3. Налаштувати confidence thresholds (почати з 80%, знижувати коли стабільно)
 4. Feedback loop: девелопер апрувить фікс → агент запам'ятовує патерн
@@ -745,7 +747,7 @@ test.describe('{Module} - Critical Paths', () => {
 
 **День 2-3**
 - [ ] Створити 1 seed spec вручну (AI-assisted)
-- [ ] Створити `.cursor/agents/knowledge-grower.md`
+- [ ] Створити `plugins/ai-sdlc/agents/knowledge-grower.md`
 - [ ] Створити skills: `spec-generator`, `e2e-generator`, `criticality-classifier`
 - [ ] Automation: PR merged → @knowledge-grower
 - [ ] Мерджнути 2-3 PR → побачити auto-generated specs

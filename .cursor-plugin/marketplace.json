@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "AI-driven SDLC plugins for Cursor",
-    "version": "0.1.2"
+    "version": "0.1.3"
   },
   "plugins": [
     {
       "name": "ai-sdlc",
       "source": "./plugins/ai-sdlc",
       "description": "Self-healing AI SDLC: spec-aware review, tests, knowledge base",
-      "version": "0.1.2"
+      "version": "0.1.3"
     }
   ]
 }

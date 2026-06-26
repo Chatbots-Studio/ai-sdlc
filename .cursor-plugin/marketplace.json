@@ -11,7 +11,8 @@
     {
       "name": "ai-sdlc",
       "source": "./plugins/ai-sdlc",
-      "description": "Self-healing AI SDLC: spec-aware review, tests, knowledge base"
+      "description": "Self-healing AI SDLC: spec-aware review, tests, knowledge base",
+      "version": "0.1.0"
     }
   ]
 }

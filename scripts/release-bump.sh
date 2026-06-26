@@ -6,8 +6,6 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 VERSION_FILE="VERSION"
-PLUGIN_JSON="plugins/ai-sdlc/.cursor-plugin/plugin.json"
-MARKETPLACE_JSON=".cursor-plugin/marketplace.json"
 CHANGELOG="CHANGELOG.md"
 
 current="$(tr -d '[:space:]' < "$VERSION_FILE")"
@@ -35,11 +33,7 @@ esac
 new_version="${major}.${minor}.${patch}"
 echo "$new_version" > "$VERSION_FILE"
 
-jq --arg v "$new_version" '.version = $v' "$PLUGIN_JSON" > "${PLUGIN_JSON}.tmp"
-mv "${PLUGIN_JSON}.tmp" "$PLUGIN_JSON"
-
-jq --arg v "$new_version" '.metadata.version = $v' "$MARKETPLACE_JSON" > "${MARKETPLACE_JSON}.tmp"
-mv "${MARKETPLACE_JSON}.tmp" "$MARKETPLACE_JSON"
+./scripts/sync-version.sh
 
 DATE="$(date -u +%Y-%m-%d)"
 LAST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"

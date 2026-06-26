@@ -1,0 +1,20 @@
+{
+  "name": "ai-sdlc",
+  "displayName": "AI SDLC (Self-Healing)",
+  "version": "0.1.0",
+  "description": "Spec-aware PR review, self-healing tests, and a living specs knowledge base for any repo.",
+  "author": {
+    "name": "Chatbots Studio"
+  },
+  "license": "MIT",
+  "keywords": [
+    "cursor",
+    "sdlc",
+    "specs",
+    "pr-review",
+    "tests",
+    "agents",
+    "skills"
+  ],
+  "logo": "assets/logo.svg"
+}

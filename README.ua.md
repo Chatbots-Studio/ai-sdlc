@@ -1,10 +1,10 @@
 # ai-sdlc
 
-Cursor-first пакет для **самовідновлюваного AI-driven SDLC**.
+Cursor plugin marketplace для **самовідновлюваного AI-driven SDLC**.
 
-Цей репозиторій лише для читання. Підключіть його в Cursor — і агенти, скіли,
-правила та команди стають доступними у ваших проєктах. **Кроку встановлення
-немає** — нічого не копіюється у ваш репозиторій.
+Встановіть плагін через team marketplace або локально. Агенти, скіли, правила
+та команди стають доступними у ваших проєктах без копіювання файлів у ваш
+репозиторій.
 
 🇬🇧 [Read in English](README.md)
 
@@ -17,9 +17,28 @@ Cursor-first пакет для **самовідновлюваного AI-driven 
 пропонують тести для критичної поведінки, запускають потрібні тести та
 ескалюють, коли впевненість низька, замість того щоб вгадувати.
 
+## Встановлення
+
+### Team marketplace
+
+1. Перейдіть у **Dashboard → Settings → Plugins → Team Marketplaces → Add Marketplace**.
+2. Оберіть **Import from Repo** і вкажіть `Chatbots-Studio/ai-sdlc`.
+3. Додайте плагін `ai-sdlc` до marketplace і призначте доступ команді.
+4. Розробники встановлюють плагін через **Customize** у Cursor.
+
+Документація: [Cursor team marketplaces](https://cursor.com/docs/plugins#team-marketplaces).
+
+### Локальний тест
+
+```bash
+ln -s /path/to/ai-sdlc/plugins/ai-sdlc ~/.cursor/plugins/local/ai-sdlc
+```
+
+Перезавантажте Cursor і перевірте компоненти в **Customize**.
+
 ## Як цим користуватися
 
-1. У Cursor підключіть цей репозиторій (`Chatbots-Studio/ai-sdlc`).
+1. Встановіть плагін `ai-sdlc` (див. вище).
 2. Відкрийте свій цільовий проєкт.
 3. Один раз запустіть команду bootstrap, щоб засіяти специфікації (див. нижче).
 4. Викликайте агентів (`@diff-analyzer`, `@spec-matcher`, `@test-runner`, …) на
@@ -42,9 +61,12 @@ bootstrap-ai-sdlc
 пропонує e2e-тести лише тоді, коли тестовий фреймворк і спосіб запуску зрозумілі;
 інакше записує TODO-нотатки щодо покриття.
 
-## Агенти
+## Агенти vs Скіли
 
-Розташовані в `.cursor/agents/`. Викликаються через `@name`.
+**Агенти** — автономні workflow, які викликаються через `@name`. Вони
+оркеструють рев'ю, тестування та нарощування бази знань.
+
+Розташовані в `plugins/ai-sdlc/agents/`.
 
 | Агент | Коли використовувати | Що робить |
 | --- | --- | --- |
@@ -54,10 +76,8 @@ bootstrap-ai-sdlc
 | `@self-healer` | Коли тести падають | Обережно діагностує збої та застосовує лише виправлення з високою впевненістю. Максимум 3 спроби, ескалація нижче 80% впевненості, ніколи не виправляє ризиковану бізнес-логіку автоматично. |
 | `@knowledge-grower` | Після мержу PR | Основний агент. Вирішує, чи потрібна зміні нова специфікація, оновлення специфікації, нове регресійне покриття чи лише оновлення метаданих покриття — саме це робить репозиторій розумнішим із часом. |
 
-## Скіли
-
-Розташовані в `.cursor/skills/`. Використовуються агентами (або напряму) для
-вузьких підзадач.
+**Скіли** — вузькі підзадачі, які використовують агенти (або викликаються через
+`/skill-name`). Кожен скіл у `plugins/ai-sdlc/skills/<name>/SKILL.md`.
 
 | Скіл | Використовувати коли |
 | --- | --- |
@@ -68,7 +88,7 @@ bootstrap-ai-sdlc
 
 ## Правила
 
-Завжди активні / обмежені за областю настанови в `.cursor/rules/`:
+Завжди активні / обмежені за областю настанови в `plugins/ai-sdlc/rules/`:
 
 - `ai-sdlc-core.mdc` — базова поведінка; репозиторій є джерелом істини (завжди активне).
 - `specs-conventions.mdc` — як пишуться специфікації (діє в межах `specs/`).
@@ -86,17 +106,35 @@ bootstrap-ai-sdlc
 - **Ескалація на основі впевненості** — агенти діють за наявності сильних доказів
   і ескалюють із контекстом в інших випадках. Пороги див. у [AGENTS.md](AGENTS.md).
 
+## Релізи
+
+Кожен мердж у `main` автоматично створює реліз:
+
+1. Patch-версія збільшується в `VERSION`, `plugin.json` і `marketplace.json`.
+2. `CHANGELOG.md` оновлюється з комітів від попереднього тегу.
+3. Створюються git-тег `vX.Y.Z` і GitHub Release.
+
+Поточна версія: [`VERSION`](VERSION). Історія: [`CHANGELOG.md`](CHANGELOG.md).
+
+Для minor або major релізу вручну запустіть workflow **Release on main** у
+GitHub Actions з потрібним типом bump.
+
 ## Структура репозиторію
 
 ```txt
-AGENTS.md                 Інструкції роботи агентів і правила впевненості
-.cursor/
-  agents/                 diff-analyzer, spec-matcher, test-runner, self-healer, knowledge-grower
-  skills/                 spec-generator, e2e-generator, criticality-classifier, kb-indexer
-  rules/                  ai-sdlc-core, specs-conventions, test-conventions
-  commands/               bootstrap-ai-sdlc
-specs/                    каркас бази знань _index.md, _coverage.md
-docs/                     документація з налаштування та автоматизації
+.cursor-plugin/marketplace.json   Маніфест marketplace
+plugins/ai-sdlc/
+  .cursor-plugin/plugin.json     Маніфест плагіна
+  agents/                        diff-analyzer, spec-matcher, test-runner, self-healer, knowledge-grower
+  skills/                        spec-generator, e2e-generator, criticality-classifier, kb-indexer
+  rules/                         ai-sdlc-core, specs-conventions, test-conventions
+  commands/                      bootstrap-ai-sdlc
+VERSION                          Єдине джерело правди для версії релізу
+CHANGELOG.md                     Історія релізів
+.github/workflows/               CI та автоматизація релізів
+AGENTS.md                        Інструкції роботи агентів і правила впевненості
+specs/                           каркас бази знань _index.md, _coverage.md
+docs/                            документація з налаштування та автоматизації
 ```
 
 ## Дорожня карта
@@ -104,7 +142,6 @@ docs/                     документація з налаштування �
 - Потік налаштування автоматизації Cursor Cloud.
 - Шаблони автоматизації GitHub.
 - Підтримка кількох агентів: Claude Code, Codex, Windsurf та інші середовища.
-- Дистрибуція, готова до маркетплейсу.
 
 ## Blueprint
 

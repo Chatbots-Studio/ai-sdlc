@@ -1,17 +1,17 @@
 # Cursor Cloud Team Setup
 
-This repository is a read-only AI SDLC pack. Cursor pulls the agents, skills,
-rules, and commands directly from the repository root. There is no install step
-and nothing is copied into your project.
+This repository is a Cursor plugin marketplace. Install the `ai-sdlc` plugin
+from a team marketplace or locally. There is no copy step into your project.
 
 ## What Is Already In This Repository
 
-- `.cursor/agents/` — the AI SDLC agents (diff-analyzer, spec-matcher,
+- `plugins/ai-sdlc/agents/` — the AI SDLC agents (diff-analyzer, spec-matcher,
   test-runner, self-healer, knowledge-grower).
-- `.cursor/skills/` — supporting skills (spec-generator, e2e-generator,
+- `plugins/ai-sdlc/skills/` — supporting skills (spec-generator, e2e-generator,
   kb-indexer, criticality-classifier).
-- `.cursor/rules/` — always-on rules for the AI SDLC workflow.
-- `.cursor/commands/bootstrap-ai-sdlc.md` — bootstrap command for a new repo.
+- `plugins/ai-sdlc/rules/` — always-on rules for the AI SDLC workflow.
+- `plugins/ai-sdlc/commands/bootstrap-ai-sdlc.md` — bootstrap command for a new repo.
+- `.cursor-plugin/marketplace.json` — marketplace manifest for team distribution.
 - `AGENTS.md` — agent operating instructions and confidence rules.
 - `specs/` — living knowledge base scaffold (`_index.md`, `_coverage.md`).
 - `docs/cursor-automations.md` — copy-paste prompts for PR review and
@@ -19,29 +19,31 @@ and nothing is copied into your project.
 
 ## How To Use It
 
-Attach this repository in Cursor. Cursor exposes its agents and skills in any
-project where you invoke them. The pack is project-agnostic; the examples in the
-specs and agent output must be replaced with the real modules of the target
-repository.
+1. Add this repository as a team marketplace (Dashboard → Settings → Plugins →
+   Import from Repo).
+2. Install the `ai-sdlc` plugin from **Customize** in Cursor.
+3. Open your target project and invoke agents or run `bootstrap-ai-sdlc`.
+
+The pack is project-agnostic; the examples in the specs and agent output must be
+replaced with the real modules of the target repository.
 
 ## What A Cursor Team Admin Must Do
 
 1. Open the Cursor Team dashboard.
 2. Confirm team privacy settings and usage-based pricing.
 3. Connect GitHub in Cursor integrations.
-4. Grant Cursor read access to `Chatbots-Studio/ai-sdlc` (the repo is public and
-   read-only for the pack).
-5. If the GitHub organization uses an IP allowlist, add Cursor Background Agent
+4. Add a team marketplace from `Chatbots-Studio/ai-sdlc` (Import from Repo).
+5. Assign the `ai-sdlc` plugin to the appropriate distribution groups.
+6. If the GitHub organization uses an IP allowlist, add Cursor Background Agent
    access according to Cursor's GitHub integration instructions.
-6. Attach `Chatbots-Studio/ai-sdlc` so its agents and skills are available.
 7. Optional: install the Cursor Slack app to launch Background Agents from Slack.
 
 ## Smoke Test Prompt
 
-Run this in a target project after attaching the pack:
+Run this in a target project after installing the plugin:
 
 ```txt
-Use the ai-sdlc pack on this repository.
+Use the ai-sdlc plugin on this repository.
 
 Do not change business logic.
 
@@ -59,7 +61,7 @@ Then create a short report that includes:
 
 Expected result:
 
-- The ai-sdlc agents and skills are discoverable from the attached repo.
+- The ai-sdlc agents and skills are discoverable from the installed plugin.
 - The agent summary mentions that UI/e2e tests require screenshot or video
   artifacts when the existing framework supports them.
 

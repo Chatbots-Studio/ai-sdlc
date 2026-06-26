@@ -1,0 +1,17 @@
+{
+  "name": "ai-sdlc",
+  "owner": {
+    "name": "Chatbots Studio"
+  },
+  "metadata": {
+    "description": "AI-driven SDLC plugins for Cursor",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "ai-sdlc",
+      "source": "./plugins/ai-sdlc",
+      "description": "Self-healing AI SDLC: spec-aware review, tests, knowledge base"
+    }
+  ]
+}

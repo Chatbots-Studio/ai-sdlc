@@ -105,6 +105,19 @@ Always-on / scoped guidance in `plugins/ai-sdlc/rules/`:
 - **Confidence-driven escalation** — agents proceed on strong evidence and
   escalate with context otherwise. See thresholds in [AGENTS.md](AGENTS.md).
 
+## Releases
+
+Each merge into `main` triggers an automatic release:
+
+1. Patch version is bumped in `VERSION`, `plugin.json`, and `marketplace.json`.
+2. `CHANGELOG.md` is updated from commits since the previous tag.
+3. Git tag `vX.Y.Z` and a GitHub Release are created.
+
+Current version: see [`VERSION`](VERSION). History: [`CHANGELOG.md`](CHANGELOG.md).
+
+To cut a minor or major release manually, run the **Release on main** workflow
+from GitHub Actions with the desired bump type.
+
 ## Repository Layout
 
 ```txt
@@ -115,6 +128,9 @@ plugins/ai-sdlc/
   skills/                        spec-generator, e2e-generator, criticality-classifier, kb-indexer
   rules/                         ai-sdlc-core, specs-conventions, test-conventions
   commands/                      bootstrap-ai-sdlc
+VERSION                          Single source of truth for release version
+CHANGELOG.md                     Release history
+.github/workflows/               CI and release automation
 AGENTS.md                        Agent operating instructions and confidence rules
 specs/                           _index.md, _coverage.md knowledge-base scaffold
 docs/                            setup and automation documentation

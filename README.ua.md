@@ -106,6 +106,19 @@ bootstrap-ai-sdlc
 - **Ескалація на основі впевненості** — агенти діють за наявності сильних доказів
   і ескалюють із контекстом в інших випадках. Пороги див. у [AGENTS.md](AGENTS.md).
 
+## Релізи
+
+Кожен мердж у `main` автоматично створює реліз:
+
+1. Patch-версія збільшується в `VERSION`, `plugin.json` і `marketplace.json`.
+2. `CHANGELOG.md` оновлюється з комітів від попереднього тегу.
+3. Створюються git-тег `vX.Y.Z` і GitHub Release.
+
+Поточна версія: [`VERSION`](VERSION). Історія: [`CHANGELOG.md`](CHANGELOG.md).
+
+Для minor або major релізу вручну запустіть workflow **Release on main** у
+GitHub Actions з потрібним типом bump.
+
 ## Структура репозиторію
 
 ```txt
@@ -116,6 +129,9 @@ plugins/ai-sdlc/
   skills/                        spec-generator, e2e-generator, criticality-classifier, kb-indexer
   rules/                         ai-sdlc-core, specs-conventions, test-conventions
   commands/                      bootstrap-ai-sdlc
+VERSION                          Єдине джерело правди для версії релізу
+CHANGELOG.md                     Історія релізів
+.github/workflows/               CI та автоматизація релізів
 AGENTS.md                        Інструкції роботи агентів і правила впевненості
 specs/                           каркас бази знань _index.md, _coverage.md
 docs/                            документація з налаштування та автоматизації

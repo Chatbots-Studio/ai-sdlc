@@ -1,0 +1,80 @@
+name: Release on main
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Semver bump type
+        required: true
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-on-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      !startsWith(github.event.head_commit.message, 'chore(release):')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine bump type
+        id: bump
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "type=${{ inputs.bump }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=patch" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Bump version and update changelog
+        run: ./scripts/release-bump.sh "${{ steps.bump.outputs.type }}"
+
+      - name: Commit, tag, and push
+        id: release
+        run: |
+          VERSION="$(tr -d '[:space:]' < VERSION)"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add VERSION CHANGELOG.md plugins/ai-sdlc/.cursor-plugin/plugin.json .cursor-plugin/marketplace.json
+          git commit -m "chore(release): v${VERSION}"
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
+          git push origin main
+          git push origin "v${VERSION}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.release.outputs.version }}"
+          NOTES_FILE="$(mktemp)"
+          {
+            sed -n "/^## \\[${VERSION}\\] -/,/^## \\[/p" CHANGELOG.md | sed '$d' | tail -n +2
+          } > "${NOTES_FILE}"
+          if [[ ! -s "${NOTES_FILE}" ]]; then
+            echo "See CHANGELOG.md for details." > "${NOTES_FILE}"
+          fi
+          gh release create "v${VERSION}" \
+            --title "v${VERSION}" \
+            --notes-file "${NOTES_FILE}"

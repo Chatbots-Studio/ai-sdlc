@@ -16,5 +16,9 @@
     "agents",
     "skills"
   ],
-  "logo": "assets/logo.svg"
+  "logo": "assets/logo.svg",
+  "agents": "./agents/",
+  "skills": "./skills/",
+  "rules": "./rules/",
+  "commands": "./commands/"
 }
